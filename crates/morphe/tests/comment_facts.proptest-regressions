@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 4359f98d2e3eebae0b3f4a36e2e73ef0a46be6d0341857425e7c1b0efc4d2633 # shrinks to member = "% Comment for include block\n  #include \"file1.lp\".#include \"file2.lp\".     #include \"file3.lp\".\n"

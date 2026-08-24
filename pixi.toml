@@ -1,0 +1,24 @@
+# The pinned authority for morphe's out-of-band clingo differential
+# (docs/design/morphe.md §13; themelios docs/grammar.md §3): clingo v5.8.2
+# as conda-forge ships it — the binary and its Python module in one
+# package — used to print an AST parse's own canonical form (the format
+# leg) and to ground a reordered program (the reorder leg). Nothing here
+# enters any Rust manifest or any shipped closure; it never runs in the
+# standing gate, only through `pixi run differential`.
+[workspace]
+name = "morphe"
+channels = ["conda-forge"]
+platforms = ["osx-arm64", "osx-64", "linux-64"]
+
+[dependencies]
+clingo = "==5.8.2"
+python = ">=3.12"
+
+[tasks]
+# The clingo differential (docs/design/morphe.md §13): over the corpus
+# members, clingo's canonical rendering of the input and of `format`'s
+# output agree; over reordered members, the two ground-rule sets agree
+# (a proxy for answer-set preservation, never answer-set equivalence;
+# §15.4). Out of band and feature-gated — one clingo process per case,
+# so a single test thread.
+differential = "cargo test -p morphe --features differential --test differential -- --nocapture --test-threads=1"

@@ -1,0 +1,30 @@
+[package]
+name = "morphe-fuzz"
+version = "0.0.0"
+publish = false
+description = "Fuzz targets over morphe: run out of band, corpus committed."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[package.metadata]
+cargo-fuzz = true
+
+# libfuzzer-sys carries libFuzzer's C++ runtime, compiled by its build script:
+# this crate is a test harness outside every shipped closure — no dependency of
+# morphe, and held to no coverage or trust claim (docs/design/morphe.md §13).
+[dependencies]
+libfuzzer-sys = "0.4"
+morphe = { path = ".." }
+
+# The targets are harness bodies under a generated entry point; the workspace
+# lint tables address the shipped crates and their tests. The gate's clippy
+# still runs over these targets with warnings denied.
+[lints]
+
+[[bin]]
+name = "format"
+path = "fuzz_targets/format.rs"
+test = false
+doc = false
+bench = false

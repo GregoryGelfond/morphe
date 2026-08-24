@@ -1,0 +1,7 @@
+error[syntax::unexpected-end-of-input]: expected `.`, `:-`, `)`, or a term, found end of input
+ --> bad.lp:2:1
+  |
+1 | p(
+  |  - to close this `(`
+2 | 
+  | ^ the input ends here

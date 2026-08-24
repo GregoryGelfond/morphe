@@ -1,0 +1,7 @@
+Provenance: a curated slice of the themelios syntax corpus.
+
+Copied (inputs only) from
+`themelios/crates/themelios-syntax/tests/corpus/seeds/clingo/` — the grammar's
+corner seeds. themelios's own corpus provenance
+(`themelios/crates/themelios-syntax/tests/corpus/PROVENANCE.md`) governs their
+origin. morphe carries no expectation sidecars of its own (see ../README).

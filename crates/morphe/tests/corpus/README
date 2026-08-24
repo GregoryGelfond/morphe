@@ -1,0 +1,24 @@
+The morphe corpus (docs/design/morphe.md §13, §3.3)
+
+Vendored inputs, provenance-tagged, exercising the formatter over real and
+adversarial programs. Three trees:
+
+- kallos/ — kallos's clingofmt-derived inputs (MIT, inputs-only, attributed;
+  see kallos/LICENSE and kallos/NOTICE).
+- syntax/ — a curated slice of the themelios syntax corpus (grammar corner
+  seeds; see syntax/NOTICE).
+- morphe/ — morphe's own adversarial cases (see morphe/NOTICE).
+
+Classification. The corpus is clingo-dialect throughout (the ASP-Core-2
+differential is later, clingo-authority work). The harness derives each input's
+status by parsing it through the tier morphe trusts (§5.7): a *member* is one
+the tier admits (no parse errors); a *comment-free* member carries no comment
+token of any kind — trivia or `%!` documentation. Comment-bearing members are
+granted too, their comments woven to the same anchors (§8); non-members are
+refused (§5.7).
+
+morphe carries no per-input expectation sidecar: the tier's parse is the
+classification oracle, so member-ness and comment-freeness are read, not
+restated. (Per-input sidecars carrying the dialect and member flag were
+considered; deriving them from the trusted parser is equivalent for a formatter
+over it, and leaner.)

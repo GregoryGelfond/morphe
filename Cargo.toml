@@ -1,0 +1,40 @@
+[workspace]
+resolver = "3"
+members = ["crates/*", "crates/morphe/fuzz"]
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.97"
+license = "MIT"
+
+# Mirrors the estate standard (themelios Cargo.toml). Denied
+# workspace-wide: unused code is a defect or an idle claim; missing docs
+# break the executable-claims posture; morphe's own code is unsafe-free.
+# The trust posture (design of record, "Trust and dependency posture"):
+# the estate's safety bar binds everything morphe *authors* — ruff and
+# StyLua are accepted-but-contained behind the EmbeddedFormatter
+# boundary, never held to this bar and never trusted un-checked.
+[workspace.lints.rust]
+unsafe_code = "deny"
+missing_docs = "deny"
+unused = { level = "deny", priority = -1 }
+unused_must_use = "deny"
+dead_code = "deny"
+
+# The strictest coherent setting is the baseline; any allow is a named
+# departure carrying its argument, added where the code first needs it —
+# never waived silently (the themelios discipline).
+[workspace.lints.clippy]
+pedantic = { level = "deny", priority = -1 }
+
+# Panic containment for the embedded backends (design of record §9.5) rests on
+# the unwinding strategy: each backend wraps its call in `std::panic::catch_unwind`,
+# which catches nothing under `panic = "abort"`. Pin unwind — the default the
+# containment already assumes — so the estate's own builds keep it and no later
+# profile edit can silently disable it; a downstream consumer that chooses abort
+# takes the subprocess seam instead (§9.5, §16).
+[profile.dev]
+panic = "unwind"
+
+[profile.release]
+panic = "unwind"

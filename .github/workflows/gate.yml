@@ -1,0 +1,70 @@
+# The standing gate (docs/design/morphe.md §13): the four checks kept green on
+# every push, plus the committed coverage floor. The out-of-band clingo
+# differential and the criterion benches are not here — they need the pixi
+# environment and run out of band (§13).
+#
+# morphe depends on themelios-syntax by a path (../../../themelios), so the two
+# repositories are checked out as siblings under the workspace; the path
+# resolves from morphe/crates/morphe to ../../../themelios. themelios is public,
+# so its checkout needs no credential beyond the workflow's default token.
+name: gate
+
+on:
+  push:
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out morphe
+        uses: actions/checkout@v5
+        with:
+          path: morphe
+      - name: Check out themelios (the path dependency)
+        uses: actions/checkout@v5
+        with:
+          repository: GregoryGelfond/themelios
+          path: themelios
+          # themelios's default branch — the current tier morphe is held against.
+      - name: Install the toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy, llvm-tools-preview
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-llvm-cov
+      - name: Format
+        working-directory: morphe
+        run: cargo fmt --all --check
+      - name: Clippy
+        working-directory: morphe
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+      - name: Clippy (embedded backends)
+        working-directory: morphe
+        run: cargo clippy -p morphe -p morphe-cli --all-targets --features embedded-python,embedded-lua --locked -- -D warnings
+      - name: Test
+        working-directory: morphe
+        run: cargo test --workspace --locked
+      - name: Test (embedded backends)
+        working-directory: morphe
+        run: cargo test -p morphe -p morphe-cli --features embedded-python,embedded-lua --locked
+      - name: Doc
+        working-directory: morphe
+        env:
+          RUSTDOCFLAGS: -D warnings
+        run: cargo doc --workspace --no-deps --locked
+      # A backstop, not the measure of the suite: coverage counts lines run, not
+      # behaviour pinned (§13, the standard's caution against coverage as a
+      # target). Adversariality is carried by the property laws — the always-on
+      # certificate, idempotence, comment-fact preservation, the permutation
+      # certificate — the fuzz target, the clingo differential, and the
+      # comment-torture corpus; the floor only catches a whole region falling
+      # untested.
+      - name: Coverage floor
+        working-directory: morphe
+        run: cargo llvm-cov --workspace --exclude morphe-fuzz --locked --fail-under-lines 90

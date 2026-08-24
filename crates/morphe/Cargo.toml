@@ -1,0 +1,72 @@
+[package]
+name = "morphe"
+version = "0.1.0"
+description = "A safety-certified formatter for Answer Set Programming (the clingo/clingcon dialect and its ASP-Core-2 variant), built on themelios-syntax: layout under the fusion oracle, comments carried to their anchors, and a token-stream-equivalence certificate refused-on-violation."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+# The surface morphe consumes: the syntax tier, whose formatter-facing
+# surface is themelios docs/design/syntax.md §15. A local path dependency
+# until themelios-syntax publishes; morphe is that tier's stage-2
+# first-consumer checkpoint and feeds findings back to it.
+[dependencies]
+themelios-syntax = { path = "../../../themelios/crates/themelios-syntax" }
+
+# The embedded backends' libraries (design of record §9.6), each optional and
+# pulled in only under its feature so a lean ASP-only consumer compiles neither
+# closure (§9.2, §12). ruff's formatter is a published-but-internal, no-semver
+# crate, so it is pinned to an exact patch (§9.6); a pin move touches only
+# `embedded/ruff.rs`, the one module that names any `ruff_*` type.
+# `ruff_formatter` (same lockstep pin) supplies the `LineWidth` that module
+# translates morphe's line width into. StyLua is a documented 2.x library API,
+# carried with its CLI/LSP/wasm defaults off and `lua54` on so its default
+# `syntax` spans Lua 5.1–5.4 (clingo's embedded Lua). ruff_python_formatter
+# 0.0.10 references `serde` unconditionally in its options module, so its `serde`
+# default is required and kept (accepted, not audited, §12; serde is already in
+# the closure via StyLua).
+ruff_python_formatter = { version = "=0.0.10", optional = true }
+ruff_formatter = { version = "=0.0.10", default-features = false, optional = true }
+stylua = { version = "2", default-features = false, features = ["lua54"], optional = true }
+
+# The estate's standing assurance dev-dependencies (design of record §13),
+# from week one as in themelios: proptest for the property laws (idempotence,
+# the certificate grant, comment-fact preservation, the permutation
+# certificate) and criterion for the scaling shapes. `morphe-test-support`
+# holds the shared suite helpers as public API, so a suite pays no dead-code
+# allow for a helper it does not use. `serde_json` reads the differential
+# helper's JSON — the authority's own parse of a program — under the
+# out-of-band `differential` feature; it is already in the resolved graph.
+# The build is test-driven.
+[dev-dependencies]
+morphe-test-support = { path = "../morphe-test-support" }
+proptest = "1"
+criterion = "0.7"
+serde_json = "1"
+
+[features]
+# The embedded-script formatters (design of record, "Embedded script
+# formatting"), each behind its own gate so the ASP-only build pays
+# neither closure. Off by default: a lean consumer (e.g. an LSP wanting
+# only ASP layout) compiles neither backend. Each feature pulls in exactly
+# its backend's crates (§9.2, §9.6); the `dep:` form keeps them optional deps,
+# not implicit features.
+embedded-python = ["dep:ruff_python_formatter", "dep:ruff_formatter"]
+embedded-lua = ["dep:stylua"]
+
+# The out-of-band clingo differential (design of record §13), cross-checking
+# `format` and `reorder` against the pinned authority. It carries no code — it
+# only gates `tests/differential.rs`, which needs the pixi environment at the
+# repository root and never runs in the standing gate. Run it through
+# `pixi run differential`.
+differential = []
+
+[lints]
+workspace = true
+
+# The out-of-band scaling benches (design of record §13): the absolute numbers
+# on one machine behind the shape claims that `tests/scaling_shape.rs` holds in
+# the gate. Run through `cargo bench -p morphe`.
+[[bench]]
+name = "scaling"
+harness = false

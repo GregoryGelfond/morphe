@@ -1,0 +1,5 @@
+# rustfmt reorders `mod` declarations alphabetically by default; morphe's
+# crate roots declare their modules in the design's order instead (see
+# docs/design/morphe.md), so the formatter leaves that order to the
+# author — the themelios convention.
+reorder_modules = false

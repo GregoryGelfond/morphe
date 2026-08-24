@@ -1,0 +1,6 @@
+/target
+/.pixi
+/crates/morphe/fuzz/target
+/crates/morphe/fuzz/artifacts
+/crates/morphe/fuzz/coverage
+/crates/morphe/fuzz/corpus

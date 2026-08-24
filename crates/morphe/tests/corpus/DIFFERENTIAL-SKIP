@@ -1,0 +1,6 @@
+# path  reason
+# Members statically excluded from the clingo differential. A member whose
+# #include targets are absent from this self-contained corpus needs no entry:
+# the authority reports include_failed at runtime and the harness skips it
+# (docs/design/morphe.md §15.4). Entries here are for members the authority
+# mishandles for a reason recorded against it, not a defect in morphe.

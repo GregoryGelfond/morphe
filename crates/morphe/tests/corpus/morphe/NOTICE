@@ -1,0 +1,6 @@
+Provenance: morphe's own adversarial cases (© Gregory Gelfond, MIT).
+
+These exercise the layout and comment-placement corners morphe must survive —
+foremost `comment_torture.lp`, a comment in every slot the tier admits
+(leading, trailing, dangling before a closer, a blank-detached floater — the
+shape that surfaced kallos's transposition; docs/design/morphe.md §3.3).

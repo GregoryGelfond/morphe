@@ -1,0 +1,69 @@
+[package]
+name = "morphe-cli"
+version = "0.1.0"
+description = "The morphe command-line formatter for Answer Set Programming: format, --check, and --diff over files, directories, and stdin, with the embedded-script backends wired in."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+# The thin binary over the morphe library: argument parsing, file and
+# directory walking, stdin, diff/check rendering, and the wiring of the
+# default embedded backends. All of morphe's I/O lives here; the library
+# core is pure (docs/design/morphe.md §10, §4.1).
+[dependencies]
+morphe = { path = "../morphe" }
+
+# The argument parser (§10.1). The derive API expresses the option crop as a
+# typed struct; clap owns help, version, and value validation.
+clap = { version = "4", features = ["derive"] }
+
+# Two capabilities the CLI delegates, each confined to one module so a version
+# move or a swap touches only that file — the containment the embedded backends
+# use (§9.6, §12). `tempfile` writes the atomic in-place temp beside the target
+# (§10.1); `src/atomic.rs` is the only module naming any `tempfile` type.
+# `similar` renders the `--diff` unified diff (§10.1); `src/diff.rs` is the only
+# module naming any `similar` type. Both are advisory I/O, never the certified
+# core, so they carry the accepted-not-audited posture (§12).
+tempfile = "3"
+similar = "2"
+
+# The gitignore-aware directory walker (§10.1): a directory argument expands to
+# its `*.lp` members, honouring `.gitignore` and the `--exclude` globs. Confined
+# to one module like the capabilities above — `src/walk.rs` is the only module
+# naming any `ignore` type, so a version move or a swap of the walker touches
+# that file alone (§9.6, §12).
+ignore = "0.4"
+
+# The `morphe.toml` reader (§10.2). `toml` parses it and `serde`'s derive maps
+# it to a typed value; `#[serde(deny_unknown_fields)]` makes an unknown key a
+# usage error rather than a silent drop (§10.2). Both are advisory config I/O,
+# never the certified core, so they carry the accepted-not-audited posture
+# (§12), and `src/config.rs` is the only module naming any `toml` or `serde`
+# type — a version move or a swap of the parser touches that file alone.
+toml = "0.8"
+serde = { version = "1", features = ["derive"] }
+
+# The command the user types is `morphe`, though the package is
+# `morphe-cli` (the library owns the `morphe` package name). The crate is a
+# library (the driver and the typed `Outcome`, so the suite names the exit
+# contract rather than a raw code, §10.4) with this thin binary over it.
+# `doc = false`: the binary is a `fn main` shim with no API to document, and
+# its name collides with the `morphe` library's doc output (cargo #6313); the
+# driver's docs live under the `morphe_cli` library instead.
+[features]
+# The embedded-script backends (docs/design/morphe.md §9.2, §9.6), passed
+# through to the library so a build opts into ruff (Python) and StyLua (Lua)
+# the same way the library does. Off by default: the ASP-only `morphe` compiles
+# neither backend and every `#script` body stays verbatim unless `--format-embedded`
+# finds a backend the build enabled. The default binary a distributor ships can
+# turn these on.
+embedded-python = ["morphe/embedded-python"]
+embedded-lua = ["morphe/embedded-lua"]
+
+[[bin]]
+name = "morphe"
+path = "src/main.rs"
+doc = false
+
+[lints]
+workspace = true
