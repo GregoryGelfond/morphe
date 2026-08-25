@@ -5,19 +5,58 @@
 morphe formats the clingo/clingcon dialect of ASP (and its ASP-Core-2 variant)
 the way `rustfmt`, `black`, and `ruff` format their languages: one fixed house
 style, a single knob (the line width), and a hard safety guarantee — **morphe
-never writes output it cannot prove equivalent to its input.**
+never writes output it cannot certify against its input.**
 
-Before writing a byte, morphe re-parses its own candidate output and checks it
-against the input for token-stream equivalence: the same statements and the same
-comments, in the same order, differing only in whitespace (and, optionally,
-synonym spellings). If that check ever fails, morphe refuses rather than risk
-silently changing what a program computes. The guarantee is *checked*, not
-asserted.
+Before writing a byte, morphe re-parses its own candidate output and proves it
+stands in the right relation to the input. By default that relation is
+token-stream equivalence: the same statements and the same comments, in the
+same order, differing only in whitespace (and, optionally, synonym spellings).
+The opt-in `--reorder` proves a *permutation* instead — the same statements,
+each still equivalent to its original, reorganized within regions that
+order-sensitive statements and `#include` pin in place. Either way the
+guarantee is *checked*, not asserted: if the proof fails, morphe refuses
+rather than risk silently changing what a program computes.
 
 It is built on
 [`themelios-syntax`](https://github.com/GregoryGelfond/themelios), which owns the
 lexer, the lossless syntax tree, the typed AST, comment attachment, and the
 token-stream-equivalence certificate morphe's guarantee rests on.
+
+## At a glance
+
+morphe reflows to one house style and leaves comments and statement order
+exactly where they are. Given this input:
+
+```
+#show reach/1.
+reach(Y):-  reach(X),edge(X,Y).
+#defined edge/2.
+reach(X) :- start(X).
+#const   max=3.
+```
+
+`morphe` normalizes layout only — the spacing, the `:-`, the commas — and holds
+every statement in place:
+
+```
+#show reach/1.
+reach(Y) :- reach(X), edge(X, Y).
+#defined edge/2.
+reach(X) :- start(X).
+#const max = 3.
+```
+
+The opt-in `morphe --reorder` instead proves a permutation, moving whole
+statements (with their comments) into canonical signature order — `#defined`,
+`#const`, rules, `#show`:
+
+```
+#defined edge/2.
+#const max = 3.
+reach(Y) :- reach(X), edge(X, Y).
+reach(X) :- start(X).
+#show reach/1.
+```
 
 ## Installation
 
