@@ -1,6 +1,6 @@
 [package]
 name = "morphe-cli"
-version = "0.1.0"
+version = "1.0.0"
 description = "The morphe command-line formatter for Answer Set Programming: format, --check, and --diff over files, directories, and stdin, with the embedded-script backends wired in."
 edition.workspace = true
 rust-version.workspace = true
