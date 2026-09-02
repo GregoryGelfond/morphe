@@ -1,5 +1,9 @@
 # morphe
 
+[![Gate CI status](https://img.shields.io/github/actions/workflow/status/GregoryGelfond/morphe/gate.yml?branch=main&style=flat-square&label=gate)](https://github.com/GregoryGelfond/morphe/actions/workflows/gate.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
+![Rust 1.97+](https://img.shields.io/badge/rust-1.97%2B-orange?style=flat-square)
+
 μορφή, *form* — a formatter for Answer Set Programming.
 
 morphe formats the clingo/clingcon dialect of ASP (and its ASP-Core-2 variant)
