@@ -537,7 +537,7 @@ mod tests {
     }
 
     #[test]
-    fn barriers_are_the_order_sensitive_kinds_and_top_level_danglers() {
+    fn is_barrier_holds_exactly_for_the_order_sensitive_kinds() {
         // #program, #script, override #const, #include (unless reorder_includes),
         // and the ASP-Core-2 query are order-sensitive barriers; a plain (or
         // [default]) #const, #defined, #show, and a rule are reorderable (§15.4).
@@ -572,7 +572,10 @@ mod tests {
             None
         );
         assert_eq!(section(&first("p(1)?", Dialect::AspCore2)), None);
+    }
 
+    #[test]
+    fn a_top_level_dangling_comment_is_a_barrier_dividing_the_stream() {
         // A program-level Dangling comment is a barrier that divides the unit
         // stream (§15.1): the two rules fall on either side of it.
         let items = items_of("p.\n\n% floating\n\nq.\n", Dialect::Clingo, false);

@@ -92,10 +92,13 @@ mod tests {
     use morphe::{Certificate, CertificateBreak};
 
     #[test]
-    fn a_parse_refusal_is_a_user_error_a_broken_certificate_is_internal() {
+    fn a_parse_refusal_is_a_user_error() {
         let refusal = FormatError::HasParseErrors(Vec::new());
         assert_eq!(Outcome::from(&refusal), Outcome::UserError);
+    }
 
+    #[test]
+    fn a_broken_certificate_is_an_internal_error() {
         let bug = FormatError::CertificateBroke {
             certificate: Certificate::LayoutOnly,
             reason: CertificateBreak::NotAMember(Vec::new()),

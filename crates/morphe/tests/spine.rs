@@ -36,7 +36,7 @@ fn a_non_member_is_refused_not_formatted() {
 }
 
 #[test]
-fn format_parsed_reads_the_dialect_from_the_parse_and_ignores_options() {
+fn format_parsed_reads_the_dialect_from_the_parse() {
     let parsed = parse_at(Dialect::AspCore2, "p.\n");
     // options.dialect is Clingo but the parse is AspCore2; format_parsed uses the parse's.
     let opts = FormatOptions {

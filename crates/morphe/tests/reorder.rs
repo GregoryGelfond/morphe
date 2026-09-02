@@ -147,9 +147,21 @@ fn a_dangling_comment_holds_between_reordered_regions() {
 }
 
 #[test]
-fn the_reorder_grants_and_is_idempotent_over_the_corpus() {
-    // Every member reorders — the permutation certificate holds (§13, §15.3) — and
-    // reordering the reordered text changes nothing (idempotent, §13).
+fn the_reorder_grants_over_the_corpus() {
+    // Every member reorders — the permutation certificate holds (§13, §15.3).
+    for case in cases() {
+        if !case.is_member {
+            continue;
+        }
+        reorder(&source(&case.text), &options(case.dialect)).unwrap_or_else(|err| {
+            panic!("{}: reorder refused a member: {err:?}", case.path.display())
+        });
+    }
+}
+
+#[test]
+fn the_reorder_is_idempotent_over_the_corpus() {
+    // Reordering the reordered text changes nothing (idempotent, §13).
     for case in cases() {
         if !case.is_member {
             continue;

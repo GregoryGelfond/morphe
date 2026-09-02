@@ -123,7 +123,7 @@ mod tests {
     }
 
     #[test]
-    fn a_linebreak_floor_maps_to_whitespace_and_never_panics() {
+    fn a_linebreak_floor_maps_to_whitespace() {
         // No significant adjacency yields LineBreak (a comment/doc/shebang
         // property, §8.2); if a query ever did, `floor_to_doc` maps it to a
         // forced space — never a panic (§12; §5.5's certificate backstop).
