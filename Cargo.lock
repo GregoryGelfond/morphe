@@ -1094,7 +1094,7 @@ dependencies = [
 
 [[package]]
 name = "morphe"
-version = "1.0.1"
+version = "1.0.2"
 dependencies = [
  "criterion",
  "morphe-test-support",
@@ -2196,10 +2196,12 @@ checksum = "c13547615a44dc9c452a8a534638acdf07120d4b6847c8178705da06306a3057"
 [[package]]
 name = "themelios-base"
 version = "0.1.0"
+source = "git+https://github.com/GregoryGelfond/themelios.git?rev=87c11a3#87c11a3f2b72b81a12fd53226941fdf95e7294d3"
 
 [[package]]
 name = "themelios-syntax"
 version = "0.1.0"
+source = "git+https://github.com/GregoryGelfond/themelios.git?rev=87c11a3#87c11a3f2b72b81a12fd53226941fdf95e7294d3"
 dependencies = [
  "rowan",
  "themelios-base",

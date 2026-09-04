@@ -1,17 +1,18 @@
 [package]
 name = "morphe"
-version = "1.0.1"
+version = "1.0.2"
 description = "A safety-certified formatter for Answer Set Programming (the clingo/clingcon dialect and its ASP-Core-2 variant), built on themelios-syntax: layout under the fusion oracle, comments carried to their anchors, and a token-stream-equivalence certificate refused-on-violation."
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 
 # The surface morphe consumes: the syntax tier, whose formatter-facing
-# surface is themelios docs/design/syntax.md §15. A local path dependency
-# until themelios-syntax publishes; morphe is that tier's stage-2
-# first-consumer checkpoint and feeds findings back to it.
+# surface is themelios docs/design/syntax.md §15. Pinned to a themelios git
+# rev and adopted deliberately by a rev-bump — never the local working tree —
+# so morphe's build is insulated from in-flight themelios changes; morphe is
+# that tier's first-consumer checkpoint and feeds findings back to it.
 [dependencies]
-themelios-syntax = { path = "../../../themelios/crates/themelios-syntax" }
+themelios-syntax = { git = "https://github.com/GregoryGelfond/themelios.git", rev = "87c11a3", package = "themelios-syntax" }
 
 # The embedded backends' libraries (design of record §9.6), each optional and
 # pulled in only under its feature so a lean ASP-only consumer compiles neither
