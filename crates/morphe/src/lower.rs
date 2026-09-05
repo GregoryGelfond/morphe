@@ -675,20 +675,24 @@ impl Lowering {
                     }
                 }
                 _ => {
-                    // After the braces. A terminating dot (a token, the optimize
-                    // statement) folds into the closing slot so the group's fit
-                    // counts it — the rule's dot rule applied here (§7.1): at the
-                    // boundary the braces explode rather than emit a line one over
-                    // the width. A right guard (a node) is spaced and kept out of
-                    // the group, so it stays on the aggregate's line (§7.2).
-                    if matches!(child, SyntaxElement::Node(_)) {
-                        self.weave_leading(&mut after_braces, &child);
-                        self.emit_child(&mut after_braces, &child, Gap::Space);
-                        self.weave_trailing(&mut after_braces, &child);
-                    } else {
+                    // After the braces. Only an optimize statement's terminating
+                    // dot folds into the closing slot, so the group's fit counts it
+                    // — the rule's dot rule applied here (§7.1): at the boundary the
+                    // braces explode rather than emit a line one over the width.
+                    // Match the dot on its kind, not on "token vs node", so no other
+                    // token the grammar might one day admit after the braces is
+                    // silently mis-folded as the dot.
+                    if matches!(&child, SyntaxElement::Token(token) if token.kind() == SyntaxKind::DOT)
+                    {
                         self.weave_leading(&mut close, &child);
                         self.emit_child(&mut close, &child, Gap::Tight);
                         self.weave_trailing(&mut close, &child);
+                    } else {
+                        // A right guard (a node) is spaced and kept out of the group,
+                        // so it stays on the aggregate's line (§7.2).
+                        self.weave_leading(&mut after_braces, &child);
+                        self.emit_child(&mut after_braces, &child, Gap::Space);
+                        self.weave_trailing(&mut after_braces, &child);
                     }
                 }
             }

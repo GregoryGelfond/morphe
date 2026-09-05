@@ -50,15 +50,39 @@ fn a_fitting_rule_body_keeps_a_bare_set_element_flat() {
 }
 
 #[test]
+fn a_comment_leading_a_bare_set_body_element_injects_no_blank() {
+    // A comment before a bare set used as a body element attaches Leading to the
+    // SET_AGGREGATE node, not to the `{`, so the caller weaves it before the
+    // aggregate lowering runs. The bare-set escape's own open-slot weave therefore
+    // finds nothing, and the escaped width-break stands alone: when the rule breaks,
+    // the comment takes its own line above the set and no blank line is introduced
+    // (§7.3, §8.2). Pinned for a line and a block comment, both idempotent — the
+    // proof that the escape does not double a break with a leading-brace comment.
+    for (input, expected) in [
+        (
+            "long_head :- a,\n%c\n{ b }.\n",
+            "long_head :-\n    a,\n    %c\n    { b }.\n",
+        ),
+        (
+            "long_head :- a,\n%* c *%\n{ b }.\n",
+            "long_head :-\n    a,\n    %* c *%\n    { b }.\n",
+        ),
+    ] {
+        let out = at(16, input);
+        assert_eq!(out, expected, "{input:?}");
+        assert!(!out.contains("\n\n"), "no blank line injected for {input:?}");
+        assert_eq!(at(16, &out), out, "{input:?} must be idempotent");
+    }
+}
+
+#[test]
 fn a_nested_list_with_a_trailing_block_comment_still_explodes() {
     // A block comment trailing the `,` (its slot per the tier) owes the next
     // argument a space (§8.2); that owed space must not flatten the inter-argument
     // break, or the list cannot explode. The break survives as a soft break: the
-    // comment stays trailing its comma — its slot preserved, so the output is
-    // idempotent — and the argument after it drops to its own line when the list
-    // overflows (§7.2). (The reporter's suggested layout put the comment on the
-    // next argument's line, which would re-attach it as *leading* on re-parse and
-    // so is not idempotent; the faithful explosion is this one.)
+    // comment keeps its comma-trailing slot — so a re-parse recovers the same
+    // attachment and the output is idempotent — and the argument after it drops to
+    // its own line when the list overflows (§7.2).
     let out = at(22, "p(f(aaaaaaaa, %* c *% bbbbbbbb)).\n");
     assert_eq!(
         out,
