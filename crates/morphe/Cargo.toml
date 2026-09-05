@@ -1,6 +1,6 @@
 [package]
 name = "morphe"
-version = "1.0.2"
+version = "1.0.3"
 description = "A safety-certified formatter for Answer Set Programming (the clingo/clingcon dialect and its ASP-Core-2 variant), built on themelios-syntax: layout under the fusion oracle, comments carried to their anchors, and a token-stream-equivalence certificate refused-on-violation."
 edition.workspace = true
 rust-version.workspace = true

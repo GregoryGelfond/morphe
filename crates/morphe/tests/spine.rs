@@ -64,7 +64,11 @@ fn a_whitespace_only_script_body_keeps_its_token_and_is_certified() {
         assert_eq!(out.certificate, Certificate::UpToSpelling, "{input:?}");
         // The whitespace-only body collapses to the one space that preserves the
         // token; `#end` abuts it (§7.2).
-        let lang = if input.contains("lua") { "lua" } else { "python" };
+        let lang = if input.contains("lua") {
+            "lua"
+        } else {
+            "python"
+        };
         assert_eq!(out.text, format!("#script({lang}) #end.\n"), "{input:?}");
         // Idempotent: a second format finds the same text (§5.4).
         let again =
@@ -91,7 +95,10 @@ fn a_whitespace_script_body_with_a_newline_is_kept_byte_exact() {
     // to the single space an empty-value() body takes. The empty-value() collapse
     // is scoped to blanks/tabs with no newline; this pins the other side of that
     // line (a member that would refuse if the collapse over-reached).
-    for input in ["#script(python)\n\n\n#end.\n", "#script(python)  \n  \n#end.\n"] {
+    for input in [
+        "#script(python)\n\n\n#end.\n",
+        "#script(python)  \n  \n#end.\n",
+    ] {
         let out = format(&source(input), &FormatOptions::default())
             .unwrap_or_else(|err| panic!("{input:?} should format, got {err:?}"));
         assert_eq!(out.text, input, "{input:?} must be byte-exact");

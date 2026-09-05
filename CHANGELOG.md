@@ -9,6 +9,45 @@ that breaks either bumps the major.
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-09-05
+
+### Fixed
+
+- A `#script(lang) … #end.` with an empty body — only blanks or tabs — no longer
+  refuses to format. morphe emitted the body's empty value verbatim, which left no
+  `SCRIPT_BODY` token on re-parse; the certificate then refused its own output and
+  morphe exited `70` on valid input. A whitespace-only body is now emitted as a
+  single space, which keeps the token while its value stays empty.
+- `#minimize` and `#maximize` no longer emit a line one character past
+  `--line-width`. The statement's terminating `.` is now counted when deciding
+  whether the brace group fits, as a rule's dot already was, so the group explodes
+  at the boundary rather than overrunning it.
+- A bare set `{ … }` used as a rule-body element now drops to its own line when the
+  rule breaks — one body element per line — instead of staying flat beside the
+  element before it.
+- A nested argument list carrying a trailing block comment now explodes one
+  argument per line when it overflows. The comment's owed space no longer flattens
+  the inter-argument break, and the comment keeps its place, so the result is
+  stable under re-formatting.
+- `not` is now always spaced from what follows. `not -p` and `not { b }` were
+  rendered `not-p` and `not{ b }` — the fusion floor spaces `not` only where
+  abutment would fuse two tokens, and the house style now covers the rest.
+- A leading block comment `%* … *%` now stands on its own line directly above its
+  statement, instead of sharing the statement's line.
+- A blank line before a directive's `%!` documentation is no longer repeated
+  between the documentation and the directive.
+
+## [1.0.2] - 2026-09-04
+
+No user-facing changes: the house style and the command-line surface behave
+exactly as in 1.0.1.
+
+### Internal
+
+- `themelios-syntax` is depended on by a pinned GitHub rev rather than a local
+  path, so morphe's build is insulated from in-flight tier changes and adopts them
+  only by a deliberate rev-bump. The resolved dependency is identical.
+
 ## [1.0.1] - 2026-09-02
 
 No user-facing changes: the library and the CLI behave exactly as in 1.0.0.
@@ -57,6 +96,8 @@ carries its own posture in `docs/security/threat-model.md`. Not yet on crates.io
 (it depends on `themelios-syntax` by path): build from source with the two
 repositories cloned as siblings. Rust 1.97+ (edition 2024).
 
-[Unreleased]: https://github.com/GregoryGelfond/morphe/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/GregoryGelfond/morphe/compare/v1.0.3...HEAD
+[1.0.3]: https://github.com/GregoryGelfond/morphe/compare/v1.0.2...v1.0.3
+[1.0.2]: https://github.com/GregoryGelfond/morphe/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/GregoryGelfond/morphe/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/GregoryGelfond/morphe/releases/tag/v1.0.0

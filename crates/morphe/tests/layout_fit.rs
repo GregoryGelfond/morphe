@@ -46,7 +46,10 @@ fn a_broken_rule_body_explodes_a_bare_set_element_onto_its_own_line() {
 fn a_fitting_rule_body_keeps_a_bare_set_element_flat() {
     // The same body under a width that fits stays on one line — the leading break
     // is a soft `Line`, a space when its group is flat.
-    assert_eq!(at(100, "long_head :- a, { b }.\n"), "long_head :- a, { b }.\n");
+    assert_eq!(
+        at(100, "long_head :- a, { b }.\n"),
+        "long_head :- a, { b }.\n"
+    );
 }
 
 #[test]
@@ -70,7 +73,10 @@ fn a_comment_leading_a_bare_set_body_element_injects_no_blank() {
     ] {
         let out = at(16, input);
         assert_eq!(out, expected, "{input:?}");
-        assert!(!out.contains("\n\n"), "no blank line injected for {input:?}");
+        assert!(
+            !out.contains("\n\n"),
+            "no blank line injected for {input:?}"
+        );
         assert_eq!(at(16, &out), out, "{input:?} must be idempotent");
     }
 }
