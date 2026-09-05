@@ -1058,6 +1058,19 @@ impl Lowering {
             Some(owed) => gap.max(owed),
             None => gap,
         };
+        // `not` is always spaced from what follows (§7.2). The oracle floor forces
+        // a space only where abutment would fuse (`notp`), and leaves `not-p` and
+        // `not{` abutting — so the house style upgrades a tight gap after `not` to
+        // a space here, the one rule the floor cannot supply. Every adjacency
+        // passes through `separate`, so this holds wherever `not` prefixes its
+        // operand: a literal, a leading-negated aggregate, a theory body.
+        let gap = if gap == Gap::Tight
+            && matches!(&self.last, Some((token, _)) if token.kind() == SyntaxKind::KW_NOT)
+        {
+            Gap::Space
+        } else {
+            gap
+        };
         match gap {
             Gap::None => {}
             Gap::Tight | Gap::Space => {
