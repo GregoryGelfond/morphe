@@ -816,7 +816,7 @@ impl Lowering {
                         // refusal a whitespace-only `#script` body would otherwise hit.
                         // Emit a single space: it re-lexes to a SCRIPT_BODY whose
                         // value() is still empty, keeping the token without altering
-                        // the certified content. (A truly body-less `#script()#end.`
+                        // the certified content. (A truly body-less `#script(python)#end.`
                         // carries no SCRIPT_BODY token and never reaches this arm.)
                         out.push(Doc::Text(Cow::Borrowed(" ")));
                     } else {
