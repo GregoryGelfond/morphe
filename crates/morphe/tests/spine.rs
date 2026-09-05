@@ -83,3 +83,17 @@ fn a_body_less_script_synthesizes_no_token() {
     assert_eq!(out.text, input);
     assert!(!out.changed);
 }
+
+#[test]
+fn a_whitespace_script_body_with_a_newline_is_kept_byte_exact() {
+    // A whitespace body that *contains* a newline has a non-empty value() — the
+    // newline is content (§6, §7.2) — so it is emitted byte-exact, never collapsed
+    // to the single space an empty-value() body takes. The empty-value() collapse
+    // is scoped to blanks/tabs with no newline; this pins the other side of that
+    // line (a member that would refuse if the collapse over-reached).
+    for input in ["#script(python)\n\n\n#end.\n", "#script(python)  \n  \n#end.\n"] {
+        let out = format(&source(input), &FormatOptions::default())
+            .unwrap_or_else(|err| panic!("{input:?} should format, got {err:?}"));
+        assert_eq!(out.text, input, "{input:?} must be byte-exact");
+    }
+}
