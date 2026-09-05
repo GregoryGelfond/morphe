@@ -573,6 +573,10 @@ impl Lowering {
         let mut open = Vec::new();
         let mut interior = Vec::new();
         let mut close = Vec::new();
+        // Content after the braces that is *not* folded into the group — a right
+        // guard, spaced and kept on the aggregate's line (§7.2). The terminating
+        // dot, by contrast, folds into `close` so the group's fit counts it (§7.1).
+        let mut after_braces: Vec<Doc> = Vec::new();
         let mut inside = false;
         let mut done = false;
         // Whether the first significant element (the keyword or brace) is out: a
@@ -590,6 +594,12 @@ impl Lowering {
                     if head_seen {
                         let target = if inside && !done {
                             &mut interior
+                        } else if done {
+                            // After the braces, before the group is assembled: a
+                            // dangling comment stays in the closing slot, ahead of
+                            // the folded dot, so it is not reordered across it
+                            // (§8.2) — as a rule keeps a dangling-before-dot.
+                            &mut close
                         } else {
                             &mut *out
                         };
@@ -623,16 +633,13 @@ impl Lowering {
                 }
                 _ if !done => {
                     if child.kind() == SyntaxKind::R_BRACE {
-                        // Back to the enclosing depth before the closer.
+                        // Back to the enclosing depth before the closer. The group
+                        // is assembled after the loop, once any terminating dot has
+                        // folded into `close` (§7.1) — not here.
                         self.bracket_depth = self.bracket_depth.saturating_sub(1);
                         self.weave_leading(&mut close, &child);
                         self.emit_child(&mut close, &child, Gap::Tight);
                         self.weave_trailing(&mut close, &child);
-                        out.push(brace_group(
-                            std::mem::take(&mut open),
-                            std::mem::take(&mut interior),
-                            std::mem::take(&mut close),
-                        ));
                         done = true;
                     } else if child.kind() == SyntaxKind::SEMICOLON {
                         // The `;` weaves its own comments, as every other list
@@ -651,20 +658,33 @@ impl Lowering {
                     }
                 }
                 _ => {
-                    // After the braces: a right guard (a node) is spaced from
-                    // the aggregate; a terminating dot (a token, the optimize
-                    // statement) hugs the closing brace.
-                    let after = if matches!(child, SyntaxElement::Node(_)) {
-                        Gap::Space
+                    // After the braces. A terminating dot (a token, the optimize
+                    // statement) folds into the closing slot so the group's fit
+                    // counts it — the rule's dot rule applied here (§7.1): at the
+                    // boundary the braces explode rather than emit a line one over
+                    // the width. A right guard (a node) is spaced and kept out of
+                    // the group, so it stays on the aggregate's line (§7.2).
+                    if matches!(child, SyntaxElement::Node(_)) {
+                        self.weave_leading(&mut after_braces, &child);
+                        self.emit_child(&mut after_braces, &child, Gap::Space);
+                        self.weave_trailing(&mut after_braces, &child);
                     } else {
-                        Gap::Tight
-                    };
-                    self.weave_leading(out, &child);
-                    self.emit_child(out, &child, after);
-                    self.weave_trailing(out, &child);
+                        self.weave_leading(&mut close, &child);
+                        self.emit_child(&mut close, &child, Gap::Tight);
+                        self.weave_trailing(&mut close, &child);
+                    }
                 }
             }
         }
+        // The group is assembled once, after the loop: any terminating dot has by
+        // now folded into `close` (§7.1), so its width falls inside the group's
+        // fit; a right guard, held in `after_braces`, follows the group spaced.
+        out.push(brace_group(
+            std::mem::take(&mut open),
+            std::mem::take(&mut interior),
+            std::mem::take(&mut close),
+        ));
+        out.append(&mut after_braces);
     }
 
     /// A spaced element list (§7.2): a condition, an aggregate element, or an
