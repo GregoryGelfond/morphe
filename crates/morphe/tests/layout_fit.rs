@@ -29,3 +29,22 @@ fn an_optimize_statement_counts_its_dot_in_the_fit() {
         "#minimize{ 1@1, T : p(T) }.\n"
     );
 }
+
+#[test]
+fn a_broken_rule_body_explodes_a_bare_set_element_onto_its_own_line() {
+    // When the rule breaks, every body element takes its own line (§7.2). A bare
+    // set `{ b }` is a body element like any other: its leading break belongs to
+    // the rule's group, not to the set's own — so it breaks with the rule rather
+    // than re-fitting its bracket independently and staying flat beside `a,`.
+    assert_eq!(
+        at(16, "long_head :- a, { b }.\n"),
+        "long_head :-\n    a,\n    { b }.\n"
+    );
+}
+
+#[test]
+fn a_fitting_rule_body_keeps_a_bare_set_element_flat() {
+    // The same body under a width that fits stays on one line — the leading break
+    // is a soft `Line`, a space when its group is flat.
+    assert_eq!(at(100, "long_head :- a, { b }.\n"), "long_head :- a, { b }.\n");
+}

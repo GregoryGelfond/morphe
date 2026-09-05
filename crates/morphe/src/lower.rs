@@ -613,8 +613,25 @@ impl Lowering {
                 _ if !inside => {
                     head_seen = true;
                     if child.kind() == SyntaxKind::L_BRACE {
-                        self.weave_leading(&mut open, &child);
-                        self.emit_child(&mut open, &child, gap);
+                        // A *break* before the brace belongs to the enclosing group,
+                        // not the aggregate's own: a bare set `{ … }` as a body
+                        // element must explode with the construct that holds it — one
+                        // element per line (§7.2) — not re-fit its bracket
+                        // independently and stay flat beside its neighbours. So a soft
+                        // leading break escapes to `out` (as the inter-statement break
+                        // "stands before the group, not inside it", §7.1, §6), and the
+                        // brace opens the group with no leading break of its own. A
+                        // non-break separator — a keyword's hug (`#sum{`), a spaced
+                        // context — stays with the brace, its width placement moot and
+                        // its comment/blank interaction unchanged (idempotence, §5.4).
+                        if matches!(gap, Gap::Soft | Gap::Wrap) {
+                            self.separate(out, gap, "{");
+                            self.weave_leading(&mut open, &child);
+                            self.emit_child(&mut open, &child, Gap::None);
+                        } else {
+                            self.weave_leading(&mut open, &child);
+                            self.emit_child(&mut open, &child, gap);
+                        }
                         self.weave_trailing(&mut open, &child);
                         inside = true;
                         // The brace is a bracket: its elements sit one level
