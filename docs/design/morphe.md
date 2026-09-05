@@ -730,7 +730,11 @@ ASP's bracketed and `;`/`,`-separated constructs:
   neither indent the body nor alter the whitespace at the `)`/body boundary
   (§8, §9). `#end.` stands on its own line where the body ends in a newline;
   where it does not, forcing one would change `value()` and break the
-  certificate, so `#end` abuts the body's last line with a single space.
+  certificate, so `#end` abuts the body's last line with a single space. An
+  all-whitespace body is the degenerate case: its whole run is that trailing
+  latitude, so `value()` is empty — and emitting nothing there would drop the
+  `SCRIPT_BODY` token itself on re-parse (§5.2), so morphe emits a single space,
+  the one byte that keeps the token present while its `value()` stays empty.
 
 ### 7.3 What is content, not layout
 
