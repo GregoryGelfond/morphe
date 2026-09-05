@@ -759,6 +759,13 @@ impl Lowering {
                 SyntaxElement::Token(token) if token.kind() == SyntaxKind::WHITESPACE => {}
                 SyntaxElement::Token(token) if role(token) == TokenRole::Documentation => {
                     self.doc_line(out, token, running);
+                    // A doc line owns its own line and its `pending` puts the next
+                    // element below it (§7.3); the incoming blank belongs *above*
+                    // the run, so drop `first_gap` once it is spent — a stale blank
+                    // re-applied here would double before the statement. `first`
+                    // stays set so the keyword still earns its following space. The
+                    // other lowerings reset their gap after a doc line the same way.
+                    running = Gap::Tight;
                 }
                 SyntaxElement::Token(token) if role(token) == TokenRole::Trivia => {
                     // A comment met before the keyword rides among the doc lines
