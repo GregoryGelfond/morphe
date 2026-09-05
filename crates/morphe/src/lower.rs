@@ -1047,6 +1047,14 @@ impl Lowering {
     /// (§5.5); a break already clears any floor.
     fn separate(&mut self, out: &mut Vec<Doc>, gap: Gap, next: &str) {
         let gap = match self.pending.take() {
+            // A `Wrap` is a break that shows nothing when flat; a block comment's
+            // owed space would sort above it and, taken as the plain maximum,
+            // flatten the break into a bare space — so an argument after a trailing
+            // block comment in an exploding list could never drop to its own line
+            // (§7.2). Preserve the break, spaced when flat: `Wrap` + owed space is a
+            // `Soft` (a space flat, a newline broken). Every other pairing is the
+            // stronger of the two, the owed break or space winning where it must.
+            Some(Gap::Space) if gap == Gap::Wrap => Gap::Soft,
             Some(owed) => gap.max(owed),
             None => gap,
         };

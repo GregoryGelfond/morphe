@@ -48,3 +48,21 @@ fn a_fitting_rule_body_keeps_a_bare_set_element_flat() {
     // is a soft `Line`, a space when its group is flat.
     assert_eq!(at(100, "long_head :- a, { b }.\n"), "long_head :- a, { b }.\n");
 }
+
+#[test]
+fn a_nested_list_with_a_trailing_block_comment_still_explodes() {
+    // A block comment trailing the `,` (its slot per the tier) owes the next
+    // argument a space (§8.2); that owed space must not flatten the inter-argument
+    // break, or the list cannot explode. The break survives as a soft break: the
+    // comment stays trailing its comma — its slot preserved, so the output is
+    // idempotent — and the argument after it drops to its own line when the list
+    // overflows (§7.2). (The reporter's suggested layout put the comment on the
+    // next argument's line, which would re-attach it as *leading* on re-parse and
+    // so is not idempotent; the faithful explosion is this one.)
+    let out = at(22, "p(f(aaaaaaaa, %* c *% bbbbbbbb)).\n");
+    assert_eq!(
+        out,
+        "p(\n    f(\n        aaaaaaaa, %* c *%\n        bbbbbbbb\n    )\n).\n"
+    );
+    assert_eq!(at(22, &out), out, "the exploded form must be idempotent");
+}
