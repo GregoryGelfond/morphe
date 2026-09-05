@@ -919,6 +919,16 @@ impl Lowering {
             };
             self.comment(out, comment, gap);
         }
+        // A leading run stands on its own lines directly above the anchor, a single
+        // newline between the run and the anchor and no blank (§8.2). The last
+        // comment may be a block comment, which owes only a space (`comment`, §8.2)
+        // — so the anchor would share its line, and at the very start of the output,
+        // where no left token exists for the floor, the owed space vanishes and the
+        // two abut outright. Force the newline the leading slot requires so the
+        // anchor drops below the run.
+        if !comments.is_empty() {
+            self.pending = Some(Gap::Hard);
+        }
     }
 
     /// Emit a comment where the walk meets it, in source order — then record it so
