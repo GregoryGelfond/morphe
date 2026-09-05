@@ -45,3 +45,41 @@ fn format_parsed_reads_the_dialect_from_the_parse() {
     };
     assert!(format_parsed(&parsed, &opts).is_ok());
 }
+
+#[test]
+fn a_whitespace_only_script_body_keeps_its_token_and_is_certified() {
+    // A `#script` body of only blanks/tabs has an empty value() — the SCRIPT_BODY
+    // token the certificate's interleaved sequence counts (§5.2) would vanish if
+    // morphe emitted nothing between `)` and `#end`. morphe emits a single space,
+    // which re-lexes to a SCRIPT_BODY whose value() is still empty: the member now
+    // formats (it was refused before), is granted a certificate, and is idempotent.
+    for input in [
+        "#script(python) #end.\n",
+        "#script(python)   #end.\n",
+        "#script(python)\t#end.\n",
+        "#script(lua) #end.\n",
+    ] {
+        let out = format(&source(input), &FormatOptions::default())
+            .unwrap_or_else(|err| panic!("{input:?} should format, got {err:?}"));
+        assert_eq!(out.certificate, Certificate::UpToSpelling, "{input:?}");
+        // The whitespace-only body collapses to the one space that preserves the
+        // token; `#end` abuts it (§7.2).
+        let lang = if input.contains("lua") { "lua" } else { "python" };
+        assert_eq!(out.text, format!("#script({lang}) #end.\n"), "{input:?}");
+        // Idempotent: a second format finds the same text (§5.4).
+        let again =
+            format(&source(&out.text), &FormatOptions::default()).expect("the output re-formats");
+        assert_eq!(again.text, out.text, "{input:?} not idempotent");
+    }
+}
+
+#[test]
+fn a_body_less_script_synthesizes_no_token() {
+    // `#script(python)#end.` carries no SCRIPT_BODY token at all (nothing stands
+    // between `)` and `#end`), so the whitespace-only rule must not fire: morphe
+    // leaves it as it is, never synthesizing a token the input did not have.
+    let input = "#script(python)#end.\n";
+    let out = format(&source(input), &FormatOptions::default()).expect("a member formats");
+    assert_eq!(out.text, input);
+    assert!(!out.changed);
+}

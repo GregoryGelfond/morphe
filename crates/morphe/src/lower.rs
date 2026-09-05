@@ -786,13 +786,28 @@ impl Lowering {
                 SyntaxElement::Token(token) if token.kind() == SyntaxKind::SCRIPT_BODY => {
                     let value = ScriptBody::cast(token.clone())
                         .map_or_else(|| token.text().to_owned(), |body| body.value().to_owned());
-                    // A body that does not end its own line keeps a single blank
-                    // before `#end` — layout the value trims, not a newline that
-                    // would change the value and break the certificate (§5.3).
-                    let inline = !value.is_empty() && !value.ends_with('\n');
-                    out.push(Doc::Text(Cow::Owned(value)));
-                    if inline {
+                    if value.is_empty() {
+                        // A whitespace-only body has an empty value() — trailing
+                        // blanks/tabs are the value's one latitude (§7.2), and here
+                        // they are the whole body. Emitting that empty value verbatim
+                        // would leave nothing between `)` and `#end`, which re-lexes
+                        // with no SCRIPT_BODY token at all — dropping a token the
+                        // certificate's interleaved sequence requires (§5.2), the
+                        // refusal a whitespace-only `#script` body would otherwise hit.
+                        // Emit a single space: it re-lexes to a SCRIPT_BODY whose
+                        // value() is still empty, keeping the token without altering
+                        // the certified content. (A truly body-less `#script()#end.`
+                        // carries no SCRIPT_BODY token and never reaches this arm.)
                         out.push(Doc::Text(Cow::Borrowed(" ")));
+                    } else {
+                        // A body that does not end its own line keeps a single blank
+                        // before `#end` — layout the value trims, not a newline that
+                        // would change the value and break the certificate (§5.3).
+                        let inline = !value.ends_with('\n');
+                        out.push(Doc::Text(Cow::Owned(value)));
+                        if inline {
+                            out.push(Doc::Text(Cow::Borrowed(" ")));
+                        }
                     }
                     // The verbatim region ends the oracle's reach: `#end` abuts
                     // the body's last line (a newline there sets it on its own).
