@@ -679,7 +679,25 @@ the `lower` module encodes it, and every rule has a golden (§13).
 ### 7.2 Spacing and breaking, per construct
 
 The rules, stated as the `black`/`ruff` reflow discipline mapped onto
-ASP's bracketed and `;`/`,`-separated constructs:
+ASP's bracketed and `;`/`,`-separated constructs. Two principles run
+through the catalog, so each construct below reads as an instance rather
+than a rule of its own. **When to break:** a construct explodes at a *list
+or chain* separator — a body's commas, an argument list's, an aggregate's
+`;`, a disjunction's `|`, an operator chain's operators — one element per
+line when it overflows. A *relation* is not such a separator: a comparison
+or guard is read inline and does not break at its `<`/`=`/guard, so a wide
+operand breaks within itself and the relation stays on its line — a long
+relation chain (grammar §5.2 admits `1 < X < 5 < …`) stays on the one line
+by design. A **fixed joiner** takes a set spacing and never breaks: a
+condition's `:` is spaced, a priority's `@` and a signature's `/` are hugged.
+The element a `:` binds — a conditional literal, an aggregate or optimize
+element — stays a fixed-spaced unit on its line (over-width by design if the
+unit is large) while the list around it explodes at its own separators.
+**What to break by:** precedence
+and grouping are read from the node where the tier carries them and never
+recomputed there; where the tier carries none — a theory operator run
+(grammar §5.8) — morphe supplies a layout-only grouping, which §2 permits
+because it re-derives no rule the tier owns. Per construct:
 
 - **Necks.** `:-` and `:~` are spaced on both sides (`h :- b.`). A rule
   whose body does not fit breaks after the neck, one body element per
@@ -700,19 +718,52 @@ ASP's bracketed and `;`/`,`-separated constructs:
   element per line — `#minimize{ 1@1, T : p(T) }`. (`#minimise`/`#maximise`
   normalize to `#minimize`/`#maximize`, §7.4.)
 - **Comparisons and guards** space their relations: `X < Y`, `1 #count{…}
-  3`. Guard sequences render in source order (syntax.md §8.2).
-- **Disjunction** spaces its `|`: `a | b`. (The `|` is an anchor, not a
-  closer — syntax.md §9.2; §8.)
+  3`; a relation is not a list/chain separator (above), so they do not break
+  at it — a wide operand breaks within itself and the relation stays on its
+  line, and a long relation chain stays on the one line by design. Guard
+  sequences render in source order (syntax.md §8.2).
+- **Disjunction** spaces its `|`: `a | b`, and a head that does not fit breaks
+  at the `|`, one disjunct per line — a `|`-list exploded like a body (it
+  widens by disjunct count). (The `|` is an anchor, not a closer — syntax.md
+  §9.2; §8.)
 - **Operator chains** render flat with spaced binary operators
-  (`1 + 2 - 3`) and hugged unary operators (`-X`, `not p`); precedence and
-  associativity are read from the node (syntax.md §8.2), never
-  re-derived, and parentheses the author wrote are preserved (a `Pool` of
-  one tuple of one term is the parenthesized form; syntax.md §8.2).
+  (`1 + 2 - 3`) and hugged unary operators (`-X`, `not p`) when they fit; a
+  chain that does not fit breaks at its spaced operators — those the
+  bracket-depth rule spaces (below) — one operand per line, indented one level,
+  the operator trailing the operand it follows, as a rule body breaks after its
+  neck (above). Precedence and associativity are read from the node (syntax.md
+  §8.2): a `BINARY_TERM` holds one precedence level's operands, so the break
+  falls at that level and a tighter level — a child operand — stays flat
+  (`X = 10 * a + 10 * b + …` breaks at the `+`s, each `10 * a` whole); an
+  operand that still overflows recurses. Parentheses the author wrote are
+  preserved (a `Pool` of one tuple of one term is the parenthesized form;
+  syntax.md §8.2).
+- **Theory operator runs** (`THEORY_OPTERM`) are one flat sequence — grammar
+  §5.8 admits theory operators without precedence — so an overflowing run has
+  no node level to break at, and the second principle (above) governs: morphe
+  supplies a layout-only grouping. Where every operator in the run is one of
+  grammar §5.1's term operators, morphe reads it by that precedence ladder and
+  breaks it as an operator chain (above), at the loosest level present. This
+  grouping is a layout heuristic, sound where those spellings carry their
+  standard term precedence — as `&sum`/`&diff` and their kin intend; a `#theory`
+  definition may give those operators another precedence, which morphe
+  reads no theory definition to see, so the grouping can then mislead the eye.
+  The certificate is untouched throughout — the break moves no significant token
+  (§5.2) — so it is fidelity, not correctness, that the heuristic trades. A run
+  carrying any other operator (a custom operator, `not`, `:-:`) has no reading
+  morphe may assume, so it breaks between its terms, one per line — each
+  operator run trailing the term it follows and never breaking within itself
+  (grammar §5.8 admits runs like `not -`, `- -`), a leading prefix run heading
+  its term instead — so the line's unit is a term with its adjacent operators
+  (`not - b` stays whole, a §13 golden). A bracketed theory term within a run
+  (`cost(a)`, a set, a tuple) keeps its own bracket rule, exploding its
+  contents only when that term is itself too wide.
 - **Bracket depth tightens spacing** — kallos's rule, which the §13 goldens
-  pin. A `,`/`;` separator is spaced at one bracket deep and tight from two:
-  `p(X, Y)` and `@f(a, b)` (spaced), but a nested list tightens — `p(f(a,b))`,
-  a tuple inside an aggregate brace. A term operator is spaced only at the top
-  level and tight inside any bracket: `X = Y + Z` and `1 + 2 - 3`, but `p(X+Y)`.
+  pin. A `,`/`;` separator is spaced at the top level and one bracket deep,
+  and tight from two: `h :- a, b` and `p(X, Y)` (spaced), but a nested list
+  tightens — `p(f(a,b))`, a tuple inside an aggregate brace. A term operator
+  is spaced only at the top level and tight inside any bracket: `X = Y + Z`
+  and `1 + 2 - 3`, but `p(X+Y)`.
   (Comparison and guard relations are always spaced (above); `not` is always
   spaced; a classical or unary `-`/`~` always hugs its operand.)
 - **Annotations** (the one `[…]` bracket family — weak-constraint
@@ -720,7 +771,8 @@ ASP's bracketed and `;`/`,`-separated constructs:
   brackets and space after commas, like argument lists.
 - **Directives** (`#show`, `#program`, `#const`, `#external`, `#edge`,
   `#project`, `#defined`, `#include`, `#theory`) render with a single
-  space after the keyword and their family's punctuation spaced as above.
+  space after the keyword and their family's punctuation spaced as above,
+  save a signature `/`, which hugs (`#show p/2`, `#project p/1`).
 - **`#script(lang) … #end.`** — the header renders normally *up to and
   including the `)`*, after which the `SCRIPT_BODY` runs to `#end` (grammar
   §4.8). The body is emitted **byte-exact** from immediately after that

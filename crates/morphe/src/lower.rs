@@ -21,11 +21,15 @@
 use std::borrow::Cow;
 use std::collections::HashSet;
 
-use themelios_syntax::ast::{AstToken, Comment, Program, ScriptBody};
+use themelios_syntax::ast::{
+    AstToken, Comment, Precedence, Program, ScriptBody, TheoryOpTerm, TheoryOpTermItem,
+};
 use themelios_syntax::attach::empty_line_between;
 use themelios_syntax::dialect::Dialect;
 use themelios_syntax::parse::Parse;
-use themelios_syntax::tree::{SyntaxElement, SyntaxKind, SyntaxNode, SyntaxToken, TokenRole, role};
+use themelios_syntax::tree::{
+    AstNode, SyntaxElement, SyntaxKind, SyntaxNode, SyntaxToken, TokenRole, role,
+};
 
 use crate::comments::{self, Plan};
 use crate::doc::Doc;
@@ -152,10 +156,12 @@ impl Lowering {
             SyntaxKind::BODY => self.body(out, node, gap),
             // Spaced relations and guards (§7.2): a disjunction `|`, a comparison,
             // and an aggregate or theory guard each space their operator.
-            SyntaxKind::DISJUNCTION
-            | SyntaxKind::COMPARISON
+            SyntaxKind::COMPARISON
             | SyntaxKind::GUARD
             | SyntaxKind::THEORY_GUARD => self.children(out, node, gap, Gap::Space),
+            // A disjunction head explodes at its `|`, one disjunct per line, when
+            // it does not fit (§7.2) — a `|`-list, unlike a relation.
+            SyntaxKind::DISJUNCTION => self.disjunction(out, node, gap),
             // Spaced-brace blocks (§7.2, syntax.md §5.8): aggregates and optimize;
             // the `#theory` directive and its `{ … }` term/operator definitions;
             // a theory atom's `{ elements }`. A keyword hugs its brace, a name
@@ -211,8 +217,10 @@ impl Lowering {
             | SyntaxKind::THEORY_SET
             | SyntaxKind::THEORY_LIST
             | SyntaxKind::THEORY_TUPLE
-            | SyntaxKind::THEORY_FUNCTION
-            | SyntaxKind::THEORY_OPTERM => self.term_engine(out, node, gap),
+            | SyntaxKind::THEORY_FUNCTION => self.term_engine(out, node, gap),
+            // A theory operator run is flat with no tier precedence; morphe
+            // imposes a layout-time grouping to break it at its operators (§7.2).
+            SyntaxKind::THEORY_OPTERM => self.theory_opterm(out, node, gap),
             // A theory atom (`&name(args){ elements } guard`, syntax.md §5.8):
             // `&name` and its arguments hug, the `{ elements }` block is spaced
             // and hugs the name, the guard is spaced after the `}`.
@@ -420,6 +428,43 @@ impl Lowering {
         }
     }
 
+    /// A disjunction head (§7.2): the `|` anchor spaced from the disjunct it
+    /// follows, then a soft break so a head that does not fit explodes one
+    /// disjunct per line — a `|`-list exploded like a body. Comments weave to
+    /// their anchors as in [`children`](Self::children).
+    fn disjunction(&mut self, out: &mut Vec<Doc>, node: &SyntaxNode, first_gap: Gap) {
+        let mut inner = Vec::new();
+        let mut gap = first_gap;
+        let mut head_seen = false;
+        for child in node.children_with_tokens() {
+            match &child {
+                SyntaxElement::Token(token) if token.kind() == SyntaxKind::WHITESPACE => {}
+                SyntaxElement::Token(token) if role(token) == TokenRole::Documentation => {
+                    self.doc_line(&mut inner, token, gap);
+                    gap = Gap::Space;
+                }
+                SyntaxElement::Token(token) if role(token) == TokenRole::Trivia => {
+                    self.weave_statement_trivia(&mut inner, node, token, !head_seen);
+                }
+                SyntaxElement::Token(token) => {
+                    self.weave_leading(&mut inner, &child);
+                    self.tok(&mut inner, token, Gap::Space);
+                    self.weave_trailing(&mut inner, &child);
+                    head_seen = true;
+                    gap = Gap::Soft;
+                }
+                SyntaxElement::Node(disjunct) => {
+                    head_seen = true;
+                    self.weave_leading(&mut inner, &child);
+                    self.node(&mut inner, disjunct, gap);
+                    self.weave_trailing(&mut inner, &child);
+                    gap = Gap::Space;
+                }
+            }
+        }
+        out.push(chain_group(inner, chain_aligns(node)));
+    }
+
     /// Lower a term-rooted or argument-list subtree — the one genuine depth
     /// source, bracket nesting — on an explicit frame stack, so the input's
     /// bracket depth is the stack's height and never this walk's call depth
@@ -432,7 +477,7 @@ impl Lowering {
     /// kallos's depth rule): a `,`/`;` is spaced at depth ≤ 1, an operator only
     /// at depth 0.
     fn term_engine(&mut self, out: &mut Vec<Doc>, entry: &SyntaxNode, first_gap: Gap) {
-        let mut frames = vec![Frame::open(entry, first_gap)];
+        let mut frames = vec![Frame::open(entry, first_gap, self.bracket_depth)];
         loop {
             let top = frames.len() - 1;
             if let Some(child) = frames[top].children.next() {
@@ -483,7 +528,15 @@ impl Lowering {
             SyntaxElement::Node(node) => {
                 self.weave_leading(&mut frames[top].interior, child);
                 let gap = frames[top].gap;
-                frames.push(Frame::open(node, gap));
+                if node.kind() == SyntaxKind::THEORY_OPTERM {
+                    // A nested opterm breaks by its own rule, not as a flat frame
+                    // (§7.2); it emits inline rather than opening a frame.
+                    self.theory_opterm(&mut frames[top].interior, node, gap);
+                    self.weave_trailing(&mut frames[top].interior, child);
+                    frames[top].gap = element_gap(frames[top].kind, self.bracket_depth);
+                } else {
+                    frames.push(Frame::open(node, gap, self.bracket_depth));
+                }
             }
         }
     }
@@ -551,7 +604,14 @@ impl Lowering {
         self.weave_leading(&mut frames[top].interior, child);
         self.tok(&mut frames[top].interior, token, gap);
         self.weave_trailing(&mut frames[top].interior, child);
-        frames[top].gap = element_gap(kind, self.bracket_depth);
+        // A trailing operator in a top-level chain owes the break that lands the
+        // next operand on its own line (§7.2); any other leaf's join is the
+        // depth rule's.
+        frames[top].gap = if chain_breaks(kind, frames[top].open_depth) {
+            Gap::Soft
+        } else {
+            element_gap(kind, self.bracket_depth)
+        };
     }
 
     /// Emit one significant child under `gap`: a token by its canonical
@@ -908,6 +968,147 @@ impl Lowering {
         }
     }
 
+    /// A theory operator run (`THEORY_OPTERM`, §7.2): one flat sequence, no tier
+    /// precedence (grammar §5.8). An all-arithmetic run — every operator one of
+    /// grammar §5.1's term operators, ranked by spelling (`theory_op_precedence`,
+    /// as the tier lexes them all to one `THEORY_OP` kind) — breaks by that ladder
+    /// at the loosest level present, recursing; a run carrying any other operator,
+    /// which morphe cannot rank, breaks between its terms. A break point is read
+    /// from position, not arity: an operator is a candidate only where a term
+    /// precedes it, so a prefix run rides with its operand.
+    fn theory_opterm(&mut self, out: &mut Vec<Doc>, node: &SyntaxNode, gap: Gap) {
+        let opterm = TheoryOpTerm::cast(node.clone()).expect("a theory opterm node");
+        // A comment among the run's own tokens is not in `items()`, so breaking the
+        // run here would drop it and fail the certificate (§5.2). The term engine
+        // weaves it, so a commented run stays flat there rather than break.
+        let has_comment = node.children_with_tokens().any(
+            |element| matches!(&element, SyntaxElement::Token(token) if token.kind().is_comment()),
+        );
+        let items: Vec<TheoryOpTermItem> = opterm.items().collect();
+        let has_binary = (0..items.len()).any(|i| {
+            i > 0
+                && matches!(items[i], TheoryOpTermItem::Op(_))
+                && matches!(items[i - 1], TheoryOpTermItem::Term(_))
+        });
+        if has_comment || !has_binary {
+            // A single term, a pure prefix run (`- - a`), or a run carrying a
+            // comment: no chain morphe may break here — the term engine lowers it
+            // whole, weaving any comment (§8).
+            self.term_engine(out, node, gap);
+            return;
+        }
+        let arithmetic = items.iter().all(|item| match item {
+            TheoryOpTermItem::Op(op) => theory_op_precedence(op).is_some(),
+            TheoryOpTermItem::Term(_) => true,
+        });
+        let align = chain_aligns(node);
+        let doc = if arithmetic {
+            self.theory_arith(&items, gap, align)
+        } else {
+            self.theory_between(&items, gap, align)
+        };
+        out.push(doc);
+    }
+
+    /// An all-arithmetic run: break at the loosest-precedence binary operators
+    /// present, one operand per line, each operand recursing so a tighter level
+    /// stays flat until it overflows (§7.2, as a `BINARY_TERM`). A binary operator
+    /// is one a term precedes; a prefix operator rides with its operand.
+    fn theory_arith(&mut self, items: &[TheoryOpTermItem], leading: Gap, align: bool) -> Doc {
+        let candidates: Vec<(usize, Precedence, &SyntaxToken)> = (0..items.len())
+            .filter_map(|i| match &items[i] {
+                TheoryOpTermItem::Op(op)
+                    if i > 0 && matches!(items[i - 1], TheoryOpTermItem::Term(_)) =>
+                {
+                    theory_op_precedence(op).map(|p| (i, p, op))
+                }
+                _ => None,
+            })
+            .collect();
+        let Some(loosest) = candidates.iter().map(|(_, p, _)| *p).min() else {
+            // A single (possibly prefixed) term. A width break the chain owes it
+            // rides in the returned document, outside the term's own group: inside
+            // the group the break would render flat (its fit test passing) and be
+            // swallowed, so the chain could not explode at it (as an operand that
+            // is itself a chain hoists its break, `chain_group`).
+            let mut run = Vec::new();
+            if leading == Gap::Soft {
+                run.push(Doc::Line);
+                self.emit_run(&mut run, items, Gap::None);
+            } else {
+                self.emit_run(&mut run, items, leading);
+            }
+            return Doc::Concat(run);
+        };
+        // Each break carries its operator token, so the emit loop writes it
+        // directly: `candidates` already proved the index is an `Op`, and the
+        // token rides that proof through to emission rather than the loop
+        // re-deriving it (grammar §5.8; §12 totality).
+        let breaks: Vec<(usize, &SyntaxToken)> = candidates
+            .iter()
+            .filter(|(_, p, _)| *p == loosest)
+            .map(|(i, _, op)| (*i, *op))
+            .collect();
+        let mut inner = Vec::new();
+        let mut gap = leading;
+        let mut start = 0;
+        for &(b, op) in &breaks {
+            inner.push(self.theory_arith(&items[start..b], gap, false));
+            self.tok(&mut inner, op, Gap::Space);
+            gap = Gap::Soft;
+            start = b + 1;
+        }
+        inner.push(self.theory_arith(&items[start..], gap, false));
+        chain_group(inner, align)
+    }
+
+    /// A run morphe cannot rank: break between its terms, one per line — each
+    /// operator run trailing the term it follows, a leading prefix run heading
+    /// its term (§7.2). The unit that takes a line is a term with its adjacent
+    /// operators, so `not - b` stays whole.
+    fn theory_between(&mut self, items: &[TheoryOpTermItem], leading: Gap, align: bool) -> Doc {
+        let mut inner = Vec::new();
+        let mut gap = leading;
+        let mut seen_term = false;
+        for item in items {
+            match item {
+                TheoryOpTermItem::Term(term) => {
+                    if seen_term {
+                        // The break before a term after the first goes in the
+                        // chain's own document, outside the term's group (which
+                        // would swallow it flat); the `Line` separates, so the
+                        // term takes no gap (`None`, not the anti-fusion floor).
+                        inner.push(Doc::Line);
+                        self.node(&mut inner, term.syntax(), Gap::None);
+                    } else {
+                        self.node(&mut inner, term.syntax(), gap);
+                    }
+                    seen_term = true;
+                    gap = Gap::Space;
+                }
+                TheoryOpTermItem::Op(op) => {
+                    self.tok(&mut inner, op, gap);
+                    gap = Gap::Space;
+                }
+            }
+        }
+        chain_group(inner, align)
+    }
+
+    /// Emit a run flat — its operators spaced (grammar §5.8), its terms by their
+    /// own rule — for a span with no binary break of its own (a term, a prefix
+    /// run); the first child takes `leading`.
+    fn emit_run(&mut self, out: &mut Vec<Doc>, items: &[TheoryOpTermItem], leading: Gap) {
+        let mut gap = leading;
+        for item in items {
+            match item {
+                TheoryOpTermItem::Op(op) => self.tok(out, op, gap),
+                TheoryOpTermItem::Term(term) => self.node(out, term.syntax(), gap),
+            }
+            gap = Gap::Space;
+        }
+    }
+
     /// Emit the comments leading `anchor` (§8.2): each on its own line directly
     /// above the anchor, the first keeping a single author blank before the run,
     /// none inside it — so a re-parse yields `Leading(anchor)`.
@@ -1125,12 +1326,18 @@ fn as_group(mut body: Vec<Doc>) -> Doc {
     }
 }
 
-/// Detach a leading unconditional break from `body`, descending through a leading
-/// `Concat` — a grouped head element carries its own already-hoisted break there,
-/// so the inter-statement break bubbles out through every enclosing group (§6).
+/// Detach a leading break of any strength — a soft `Line` an operand owes the
+/// operator before it, or an unconditional `HardLine`/`BlankLine` an
+/// inter-statement gap owes a statement head (§7.1) — from `body`, descending
+/// through a leading `Concat`. A grouped head element carries its own
+/// already-hoisted break there, so the break bubbles out through every enclosing
+/// group rather than sealing inside one, where `fits` would count it and force
+/// the group broken (§6). The one hoist both `as_group` (a statement's
+/// inter-statement break) and `chain_group` (a chain operand's soft break, or a
+/// disjunction head's inter-statement break) run.
 fn take_leading_break(body: &mut Vec<Doc>) -> Option<Doc> {
     match body.first_mut() {
-        Some(Doc::HardLine | Doc::BlankLine) => Some(body.remove(0)),
+        Some(Doc::Line | Doc::HardLine | Doc::BlankLine) => Some(body.remove(0)),
         Some(Doc::Concat(inner)) => {
             let taken = take_leading_break(inner);
             if inner.is_empty() {
@@ -1173,11 +1380,16 @@ struct Frame {
     close: Vec<Doc>,
     /// Whether the open bracket has been seen (the abs bars share a kind).
     opened: bool,
+    /// The bracket depth the frame's own operators sit at, captured at open —
+    /// so `finish` and `term_token` know whether a `BINARY_TERM` is a top-level
+    /// chain that breaks at its operators (§7.2, `chain_breaks`).
+    open_depth: usize,
 }
 
 impl Frame {
-    /// Open a frame over `node`, its first child taking `gap`.
-    fn open(node: &SyntaxNode, gap: Gap) -> Frame {
+    /// Open a frame over `node`, its first child taking `gap`, its operators at
+    /// bracket depth `open_depth`.
+    fn open(node: &SyntaxNode, gap: Gap, open_depth: usize) -> Frame {
         Frame {
             kind: node.kind(),
             element: SyntaxElement::Node(node.clone()),
@@ -1187,14 +1399,19 @@ impl Frame {
             interior: Vec::new(),
             close: Vec::new(),
             opened: false,
+            open_depth,
         }
     }
 
     /// The frame's document: a bracket frame groups its interior between its
-    /// brackets; a flat frame concatenates its children (§7.2).
+    /// brackets; a top-level operator chain nests and breaks at its operators;
+    /// any other flat frame concatenates its children (§7.2).
     fn finish(self) -> Doc {
         if is_bracket(self.kind) {
             bracket_group(self.open, self.interior, self.close)
+        } else if chain_breaks(self.kind, self.open_depth) {
+            let align = matches!(&self.element, SyntaxElement::Node(n) if chain_aligns(n));
+            chain_group(self.interior, align)
         } else {
             Doc::Concat(self.interior)
         }
@@ -1243,6 +1460,33 @@ fn is_list(kind: SyntaxKind) -> bool {
     )
 }
 
+/// Whether a frame is a top-level operator chain that breaks at its operators
+/// when it overflows (§7.2): a `BINARY_TERM` at bracket depth 0, whose operators
+/// the depth rule spaces. A deeper chain is tight and rides inside the bracket
+/// that breaks around it; a theory run is broken by `theory_opterm`, not here.
+fn chain_breaks(kind: SyntaxKind, open_depth: usize) -> bool {
+    kind == SyntaxKind::BINARY_TERM && open_depth == 0
+}
+
+/// The grammar §5.1 term precedence morphe reads an operator by when it lays out
+/// a theory run (§7.2), matched on the operator's **spelling**: the tier lexes
+/// every theory operator to one generic `THEORY_OP` kind (grammar §5.8), its
+/// precedence the `#theory` definition's, above the tier — so morphe supplies the
+/// reading for the standard operators as layout from their spelling, and ranks any
+/// other spelling `None`, which routes the run to breaking between its terms.
+fn theory_op_precedence(op: &SyntaxToken) -> Option<Precedence> {
+    Some(match op.text() {
+        ".." => Precedence::Interval,
+        "^" => Precedence::BitXor,
+        "?" => Precedence::BitOr,
+        "&" => Precedence::BitAnd,
+        "+" | "-" => Precedence::Additive,
+        "*" | "/" | "\\" => Precedence::Multiplicative,
+        "**" => Precedence::Exponentiation,
+        _ => return None,
+    })
+}
+
 /// The gap a frame places after an element, before its next child: a theory
 /// operator is always spaced (`x - y`, `- x`; greedy munch forbids `x-y`,
 /// syntax.md §5.8); a term operator is spaced only at bracket depth 0 (`X + Y`,
@@ -1281,6 +1525,51 @@ fn pre_brace_gap(child: &SyntaxElement) -> Gap {
 /// construct, carrying a hard inter-statement break, must go through [`as_group`].
 fn group_nest(inner: Vec<Doc>) -> Doc {
     Doc::Group(Box::new(Doc::Nest(Box::new(Doc::Concat(inner)))))
+}
+
+/// A top-level operator chain's document (§7.2): the operands nested in one
+/// group that breaks at the operators, one operand per line. A leading break must
+/// stand *before* the group, never inside it — the soft break the preceding
+/// operator owes the next operand (else swallowed flat inside the operand's own
+/// group, the fit test an inner group re-runs), and the unconditional
+/// inter-statement break a head carries (a disjunction head is a chain; sealed in
+/// the group, `fits` forces the whole rule broken and the `Nest` indents it —
+/// §7.1, §6). `take_leading_break` lifts whichever leads, the same hoist a
+/// statement head runs, so an enclosing group renders it at the outer indent.
+fn chain_group(mut interior: Vec<Doc>, align: bool) -> Doc {
+    let lead = take_leading_break(&mut interior);
+    let body = if align {
+        // The sole content of a bracket: the bracket already supplies the level,
+        // so the chain aligns its operands at it rather than nesting again (§7.2).
+        Doc::Group(Box::new(Doc::Concat(interior)))
+    } else {
+        group_nest(interior)
+    };
+    match lead {
+        Some(brk) => Doc::Concat(vec![brk, body]),
+        None => body,
+    }
+}
+
+/// Whether a chain aligns at its container's indent — its sole bracket supplies
+/// the level — rather than nesting one level as an inline continuation (§7.2). A
+/// theory run that is the content of an exploding theory bracket (a theory
+/// element or a bracketed theory term) aligns; a chain that shares its line (a
+/// comparison's operand, a theory guard's operand — inline after the `}`, with no
+/// bracket to supply the level) or is a tighter level within a chain nests. Only
+/// a `THEORY_OPTERM` reaches an aligning parent: a `BINARY_TERM` chains only at
+/// bracket depth 0 (`chain_breaks`), where its parent is never one of these.
+fn chain_aligns(node: &SyntaxNode) -> bool {
+    node.parent().is_some_and(|parent| {
+        matches!(
+            parent.kind(),
+            SyntaxKind::THEORY_ELEMENT
+                | SyntaxKind::THEORY_SET
+                | SyntaxKind::THEORY_LIST
+                | SyntaxKind::THEORY_TUPLE
+                | SyntaxKind::THEORY_FUNCTION
+        )
+    })
 }
 
 /// Assemble a bracketed group (§7.2): the open bracket, the interior nested one

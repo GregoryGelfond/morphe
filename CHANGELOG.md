@@ -9,6 +9,21 @@ that breaks either bumps the major.
 
 ## [Unreleased]
 
+## [1.0.4] - 2026-09-05
+
+### Fixed
+
+- A long theory atom (`&sum { … }`) that overflows the line now breaks at its
+  operators — one operand per line, each `10 * cost(a)` whole — instead of
+  overrunning the width or breaking inside a term. Where every operator in the
+  run is a standard term operator, morphe groups the run by their precedence and
+  breaks at the loosest level present; a run carrying any other operator breaks
+  between its terms. Long regular operator chains (`X = 10 * a + 10 * b + …`) and
+  disjunction heads (`a | b | …`) break the same way, and a theory guard's
+  operand stays indented as a continuation of its atom's line. Layout only — the
+  certificate and idempotence are unchanged, so a file morphe already accepted
+  formats to the same tokens. (#1)
+
 ## [1.0.3] - 2026-09-05
 
 ### Fixed
@@ -96,7 +111,8 @@ carries its own posture in `docs/security/threat-model.md`. Not yet on crates.io
 (it depends on `themelios-syntax` by path): build from source with the two
 repositories cloned as siblings. Rust 1.97+ (edition 2024).
 
-[Unreleased]: https://github.com/GregoryGelfond/morphe/compare/v1.0.3...HEAD
+[Unreleased]: https://github.com/GregoryGelfond/morphe/compare/v1.0.4...HEAD
+[1.0.4]: https://github.com/GregoryGelfond/morphe/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/GregoryGelfond/morphe/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/GregoryGelfond/morphe/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/GregoryGelfond/morphe/compare/v1.0.0...v1.0.1
