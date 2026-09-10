@@ -37,11 +37,13 @@ use crate::emit::{self, Wish};
 use crate::options::FormatOptions;
 use crate::spelling::spell;
 
-/// The separator the house style places before the next emitted element.
-/// Variants are ordered weakest-to-strongest, so `a.max(b)` takes the stronger:
-/// a comment that owes the next element a separator raises the style's gap to at
-/// least what the comment owes (§8.2).
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+/// The separator the house style places before the next emitted element. It
+/// carries two independent axes — whether it breaks ([`Break`]) and its flat
+/// spacing ([`Flat`]) — as one named catalog of the combinations that arise;
+/// [`Gap::join`] reconciles the separator a woven comment owes with the style's
+/// by joining each axis, so neither the owed break nor the owed space is lost
+/// (§8.2). The axes are independent, so `Gap` has no single order.
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 enum Gap {
     /// Nothing — the first element of the output.
     None,
@@ -50,8 +52,8 @@ enum Gap {
     Tight,
     /// A hugging width break: nothing when its group is flat, a newline when
     /// broken — the break after a tight term separator and inside a hugging
-    /// bracket (§7.2). Weaker than a space, so a comment that owes one still
-    /// wins the flat gap (§8.2).
+    /// bracket (§7.2). Its flat axis is `Nothing`, so a comment owing a space wins
+    /// the flat gap while the break is preserved — the two join to a `Soft` (§8.2).
     Wrap,
     /// A space the style wants — a neck, a relation, a pipe (§7.2); or the least
     /// a block comment leaves before what follows it on its line (§8.2).
@@ -64,6 +66,80 @@ enum Gap {
     Hard,
     /// A single blank line, kept as one (§7.3).
     Blank,
+}
+
+/// Whether — and how hard — a separator breaks: the layout axis of a [`Gap`],
+/// its own domain, read independently of the flat spacing. Ordered
+/// weakest-to-strongest so a reconciliation takes the stronger break.
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+enum Break {
+    /// Never a newline — a same-line separator whose bytes the oracle floors.
+    No,
+    /// A newline only when its group breaks (`Wrap`, `Soft`).
+    Conditional,
+    /// Always a newline (`Hard`).
+    Always,
+    /// Always a blank line (`Blank`).
+    Blank,
+}
+
+/// A separator's flat rendering: the spacing axis of a [`Gap`], its own domain —
+/// nothing, or a space, when the group stays flat. Ordered nothing < space so an
+/// owed space wins the flat gap (§8.2).
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+enum Flat {
+    /// Nothing between the tokens when flat.
+    Nothing,
+    /// A space between the tokens when flat.
+    Space,
+}
+
+impl Gap {
+    /// This gap's break axis (§7.2). `None`, the first-element sentinel, reads as
+    /// a non-breaking nothing, so reconciling it with an owed gap takes the owed.
+    fn break_axis(self) -> Break {
+        match self {
+            Gap::None | Gap::Tight | Gap::Space => Break::No,
+            Gap::Wrap | Gap::Soft => Break::Conditional,
+            Gap::Hard => Break::Always,
+            Gap::Blank => Break::Blank,
+        }
+    }
+
+    /// This gap's flat-spacing axis (§7.2). Unused for an `Always`/`Blank` break,
+    /// which never renders flat; reported `Nothing` there.
+    fn flat_axis(self) -> Flat {
+        match self {
+            Gap::Space | Gap::Soft => Flat::Space,
+            Gap::None | Gap::Tight | Gap::Wrap | Gap::Hard | Gap::Blank => Flat::Nothing,
+        }
+    }
+
+    /// The gap named by a `(break, flat)` pair: the six gaps that carry both axes.
+    /// `None`, the first-element sentinel, shares `Tight`'s coordinates and is never
+    /// a reconciliation result, so it is not produced here. Total; an `Always`/
+    /// `Blank` break ignores the flat axis.
+    fn from_axes(brk: Break, flat: Flat) -> Gap {
+        match (brk, flat) {
+            (Break::No, Flat::Nothing) => Gap::Tight,
+            (Break::No, Flat::Space) => Gap::Space,
+            (Break::Conditional, Flat::Nothing) => Gap::Wrap,
+            (Break::Conditional, Flat::Space) => Gap::Soft,
+            (Break::Always, _) => Gap::Hard,
+            (Break::Blank, _) => Gap::Blank,
+        }
+    }
+
+    /// Reconcile this style gap with the one a woven comment owes the next element
+    /// (§8.2) by joining each axis: the stronger break, the wider flat. So a flat
+    /// `Wrap` owed a `Space` is a `Soft` — the break preserved, spaced when flat —
+    /// never a plain maximum that would drop the break. Commutative; total.
+    fn join(self, owed: Gap) -> Gap {
+        Gap::from_axes(
+            self.break_axis().max(owed.break_axis()),
+            self.flat_axis().max(owed.flat_axis()),
+        )
+    }
 }
 
 /// Lower a parsed program to a document (§5.1 step 2): the house style over the
@@ -1269,15 +1345,12 @@ impl Lowering {
     /// (§5.5); a break already clears any floor.
     fn separate(&mut self, out: &mut Vec<Doc>, gap: Gap, next: &str) {
         let gap = match self.pending.take() {
-            // A `Wrap` is a break that shows nothing when flat; a block comment's
-            // owed space would sort above it and, taken as the plain maximum,
-            // flatten the break into a bare space — so an argument after a trailing
-            // block comment in an exploding list could never drop to its own line
-            // (§7.2). Preserve the break, spaced when flat: `Wrap` + owed space is a
-            // `Soft` (a space flat, a newline broken). Every other pairing is the
-            // stronger of the two, the owed break or space winning where it must.
-            Some(Gap::Space) if gap == Gap::Wrap => Gap::Soft,
-            Some(owed) => gap.max(owed),
+            // Reconcile the style's gap with the one a woven comment owes the next
+            // element by joining them on each axis (§8.2): the stronger break, the
+            // wider flat. A flat `Wrap` owed a `Space` becomes a `Soft`, the break
+            // preserved and spaced when flat — the join, never a plain maximum that
+            // could flatten the owed-past break.
+            Some(owed) => gap.join(owed),
             None => gap,
         };
         // `not` is always spaced from what follows (§7.2). The oracle floor forces
@@ -1636,4 +1709,49 @@ fn bracket_group(open: Vec<Doc>, interior: Vec<Doc>, close: Vec<Doc>) -> Doc {
 /// explode one element per line when they do not fit.
 fn brace_group(open: Vec<Doc>, interior: Vec<Doc>, close: Vec<Doc>) -> Doc {
     grouped(open, interior, close, || Doc::Line)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn join_lifts_a_flat_wrap_owed_a_space_to_a_soft_break() {
+        // #9: the reconciliation is the two-axis join, not a special case. A `Wrap`
+        // (breaks, nothing flat) owed a `Space` (no break, space flat) is a `Soft`
+        // (breaks, space flat), so the owed space never flattens the break (§8.2).
+        assert_eq!(Gap::Wrap.join(Gap::Space), Gap::Soft);
+        assert_eq!(Gap::Space.join(Gap::Wrap), Gap::Soft);
+    }
+
+    #[test]
+    fn join_takes_the_stronger_break_and_the_wider_flat_on_every_owed_pair() {
+        // A woven comment owes only a `Hard` (a comment or doc line owns its line)
+        // or a `Space` (a block comment's owed space), §8.2. On every incoming gap
+        // the join reproduces the reconciliation morphe has always made.
+        let gaps = [
+            Gap::None,
+            Gap::Tight,
+            Gap::Wrap,
+            Gap::Space,
+            Gap::Soft,
+            Gap::Hard,
+            Gap::Blank,
+        ];
+        for gap in gaps {
+            let owed_hard = if gap == Gap::Blank {
+                Gap::Blank
+            } else {
+                Gap::Hard
+            };
+            assert_eq!(gap.join(Gap::Hard), owed_hard, "{gap:?}.join(Hard)");
+            let owed_space = match gap {
+                Gap::None | Gap::Tight | Gap::Space => Gap::Space,
+                Gap::Wrap | Gap::Soft => Gap::Soft,
+                Gap::Hard => Gap::Hard,
+                Gap::Blank => Gap::Blank,
+            };
+            assert_eq!(gap.join(Gap::Space), owed_space, "{gap:?}.join(Space)");
+        }
+    }
 }

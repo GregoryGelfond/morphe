@@ -728,17 +728,35 @@ because it re-derives no rule the tier owns. Per construct:
   widens by disjunct count). (The `|` is an anchor, not a closer — syntax.md
   §9.2; §8.)
 - **Operator chains** render flat with spaced binary operators
-  (`1 + 2 - 3`) and hugged unary operators (`-X`, `not p`) when they fit; a
-  chain that does not fit breaks at its spaced operators — those the
-  bracket-depth rule spaces (below) — one operand per line, indented one level,
-  the operator trailing the operand it follows, as a rule body breaks after its
-  neck (above). Precedence and associativity are read from the node (syntax.md
-  §8.2): a `BINARY_TERM` holds one precedence level's operands, so the break
-  falls at that level and a tighter level — a child operand — stays flat
-  (`X = 10 * a + 10 * b + …` breaks at the `+`s, each `10 * a` whole); an
-  operand that still overflows recurses. Parentheses the author wrote are
-  preserved (a `Pool` of one tuple of one term is the parenthesized form;
+  (`1 + 2 - 3`) and hugged unary operators (`-X`, `~X`) when they fit — `not`,
+  though a prefix operator, is always spaced from its operand (`not p`), never
+  hugged (the bracket-depth rule below). A chain that does not fit breaks at its
+  spaced operators — those the bracket-depth rule spaces (below) — one operand per
+  line, the operator trailing the operand it follows, as a rule body breaks after
+  its neck (above). The continuation **nests**, indented one level, except within
+  a bracket that already supplies that level — a theory element, set, list, tuple,
+  or function — where it **aligns** under the run's first operand rather than
+  indenting twice; the §13 goldens pin both. Precedence and associativity are read
+  from the node (syntax.md §8.2): a `BINARY_TERM` holds one precedence level's
+  operands, so the break falls at that level and a tighter level — a child operand
+  — stays flat (`X = 10 * a + 10 * b + …` breaks at the `+`s, each `10 * a`
+  whole); an operand that still overflows recurses. Parentheses the author wrote
+  are preserved (a `Pool` of one tuple of one term is the parenthesized form;
   syntax.md §8.2).
+- **Theory atoms** (`&name(args) { elements } op guard`, grammar §5.8) lay each
+  part out by the shape it mirrors. The `&name` head hugs its argument parens, and
+  its element brace hugs that head — `&foo(a, b){ x }` — as a function term and an
+  aggregate keyword hug theirs. The element brace is spaced inside like an
+  aggregate's (`&sum{ x; y }`), its elements separated by `; `/`, ` and exploded
+  one per line when they overflow; a theory term that is itself a set `{…}`, list
+  `[…]`, tuple `(…)`, or function instead hugs its brackets like an argument list
+  or tuple (`&a{ {x,y} }`), its `;`/`,` tightening by bracket depth. The guard is
+  spaced like a relation (`&sum{ x } <= k`), though it is a `THEORY_OP` and not a
+  `Relation`. A `#theory` definition's interior (grammar §5.9) is spaced
+  throughout: the definition brace is spaced inside and its elements separated by
+  `, `, and an operator set within it (`{<=, >=}`) hugs its braces but keeps its
+  comma spaced — a directive's braces add no bracket depth (below), so the
+  separators stay spaced.
 - **Theory operator runs** (`THEORY_OPTERM`) are one flat sequence — grammar
   §5.8 admits theory operators without precedence — so an overflowing run has
   no node level to break at, and the second principle (above) governs: morphe
@@ -766,14 +784,28 @@ because it re-derives no rule the tier owns. Per construct:
   is spaced only at the top level and tight inside any bracket: `X = Y + Z`
   and `1 + 2 - 3`, but `p(X+Y)`.
   (Comparison and guard relations are always spaced (above); `not` is always
-  spaced; a classical or unary `-`/`~` always hugs its operand.)
+  spaced; a classical or unary `-`/`~` always hugs its operand.) The interval `..`
+  is a term operator and takes that uniform spacing — spaced at the top level
+  (`X = 1 .. 3`), tight inside a bracket — a deliberate departure from the field's
+  hugged `1..3` idiom, kept so one rule governs every binary operator; clingo
+  parses the spaced form identically.
 - **Annotations** (the one `[…]` bracket family — weak-constraint
   `[w@p, t]`, `#heuristic`, `#external`, `#const` policy) hug their
   brackets and space after commas, like argument lists.
+- **Absolute value** (`|X|`, and the pooled `|X; Y|` — grammar §5.1) hugs its
+  bars: no space inside them (`|X|`). The `|` counts as a bracket for depth, and
+  the pool's `;` follows the bracket-depth rule — spaced at the top level
+  (`|X; Y|`), tight deeper (`p(|a;b|)`) — like any list separator. (The `|` of a
+  disjunction is a separator and an anchor, not a bracket — above, and syntax.md
+  §9.2.)
 - **Directives** (`#show`, `#program`, `#const`, `#external`, `#edge`,
   `#project`, `#defined`, `#include`, `#theory`) render with a single
   space after the keyword and their family's punctuation spaced as above,
-  save a signature `/`, which hugs (`#show p/2`, `#project p/1`).
+  save a signature `/`, which hugs (`#show p/2`, `#project p/1`). The one keyword
+  whose own bracket follows immediately, `#edge (…)`, currently takes that
+  post-keyword space instead of hugging like a function bracket — a known
+  inconsistency with `p(`/`#sum{`, left as-is here and tracked for a future major
+  (#10), since changing the fixed house style is a breaking change (§1).
 - **`#script(lang) … #end.`** — the header renders normally *up to and
   including the `)`*, after which the `SCRIPT_BODY` runs to `#end` (grammar
   §4.8). The body is emitted **byte-exact** from immediately after that

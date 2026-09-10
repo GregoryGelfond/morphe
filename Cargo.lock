@@ -1094,7 +1094,7 @@ dependencies = [
 
 [[package]]
 name = "morphe"
-version = "1.0.5"
+version = "1.0.6"
 dependencies = [
  "criterion",
  "morphe-test-support",
@@ -1108,7 +1108,7 @@ dependencies = [
 
 [[package]]
 name = "morphe-cli"
-version = "1.0.5"
+version = "1.0.6"
 dependencies = [
  "clap 4.6.6",
  "ignore",

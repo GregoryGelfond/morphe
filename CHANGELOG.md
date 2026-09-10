@@ -9,6 +9,24 @@ that breaks either bumps the major.
 
 ## [Unreleased]
 
+## [1.0.6] - 2026-09-10
+
+No user-facing changes: the house style and the command-line surface behave
+exactly as in 1.0.5.
+
+### Internal
+
+- The lowering now reconciles two adjacent separators by joining their two
+  independent axes — whether each breaks, and its flat spacing — rather than by a
+  single ordering that conflated them and needed a hand-written special case. The
+  reconciliation is total by construction and behaviour is unchanged. (#9)
+- The design of record's per-construct spacing catalog is completed: theory-atom
+  interiors, the absolute-value bars, the `..` interval, the align-vs-nest rule a
+  broken chain follows, and a wording fix distinguishing the always-spaced `not`
+  from the hugged unary operators — each now stated, and the `..` and
+  absolute-value rules pinned by house-style goldens. (`#edge`'s post-keyword space
+  is recorded as a known inconsistency deferred to a future major, #10.)
+
 ## [1.0.5] - 2026-09-10
 
 ### Fixed
@@ -133,7 +151,8 @@ carries its own posture in `docs/security/threat-model.md`. Not yet on crates.io
 (it depends on `themelios-syntax` by path): build from source with the two
 repositories cloned as siblings. Rust 1.97+ (edition 2024).
 
-[Unreleased]: https://github.com/GregoryGelfond/morphe/compare/v1.0.5...HEAD
+[Unreleased]: https://github.com/GregoryGelfond/morphe/compare/v1.0.6...HEAD
+[1.0.6]: https://github.com/GregoryGelfond/morphe/compare/v1.0.5...v1.0.6
 [1.0.5]: https://github.com/GregoryGelfond/morphe/compare/v1.0.4...v1.0.5
 [1.0.4]: https://github.com/GregoryGelfond/morphe/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/GregoryGelfond/morphe/compare/v1.0.2...v1.0.3
