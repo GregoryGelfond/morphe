@@ -7,6 +7,7 @@
 
 use std::collections::HashMap;
 
+use themelios_syntax::ast::AstToken;
 use themelios_syntax::attach::{Slot, attachments};
 use themelios_syntax::tree::{SyntaxElement, SyntaxNode, SyntaxToken};
 
@@ -52,7 +53,11 @@ pub(crate) fn plan(root: &SyntaxNode) -> Plan {
             Slot::Trailing => &mut plan.trailing,
             Slot::Dangling => &mut plan.dangling,
         };
-        runs.entry(attachment.anchor).or_default().push(comment);
+        // The bulk form yields the typed `Comment`; bucket its underlying token,
+        // so `Plan` and its consumers read `SyntaxToken`s, not the `Comment` wrapper.
+        runs.entry(attachment.anchor)
+            .or_default()
+            .push(comment.syntax().clone());
     }
     plan
 }

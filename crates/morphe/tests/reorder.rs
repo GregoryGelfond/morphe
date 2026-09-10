@@ -55,6 +55,28 @@ fn the_query_is_pinned_last_while_its_region_reorganizes() {
 }
 
 #[test]
+fn a_script_barrier_with_a_trailing_blank_body_holds_through_the_permutation_certificate() {
+    // A `#script … #end.` is a held barrier, and morphe re-emits its body as the
+    // value() — the blanks and tabs before `#end` trimmed (§5.1) — so the barrier
+    // in the reassembly is not the input barrier's raw text. The permutation
+    // certificate reads a token's identity through the tier's projection, a script
+    // body by its value (syntax.md §11.1) — the same relation each unit's own
+    // certificate proves — so the held barrier certifies rather than tripping a
+    // false BarrierMoved. Reordering the #show/#defined region around it runs the
+    // certificate (the order changes), and the reorder succeeds; the `reordered`
+    // helper's `expect` is the regression guard.
+    let out = reordered(
+        "#show s/1.\n#defined d/1.\n#script (lua) x=1   #end.\n",
+        &FormatOptions::default(),
+    );
+    assert_eq!(
+        out.text,
+        "#defined d/1.\n#show s/1.\n#script(lua) x=1 #end.\n"
+    );
+    assert!(out.reordered);
+}
+
+#[test]
 fn reorder_includes_hoists_an_include_through_the_public_reorder() {
     // The unsafe toggle flows through the public reorder (§15.4): by default a
     // top-level #include is a held barrier and nothing moves; under

@@ -12,7 +12,7 @@ use themelios_syntax::ast::Program;
 use themelios_syntax::base::source::{Source, SourceId};
 use themelios_syntax::dialect::Dialect;
 use themelios_syntax::equiv::{
-    Certificate, Mismatch, Side, canonical_spelling, equivalent, non_whitespace_tokens,
+    Certificate, Mismatch, Side, compared, equivalent, non_whitespace_tokens,
 };
 use themelios_syntax::parse::{Parse, parse};
 use themelios_syntax::tree::{SyntaxKind, SyntaxToken};
@@ -288,36 +288,20 @@ fn region_breach(
 }
 
 /// A unit's or barrier's identity for the bijection (§15.3): its non-whitespace
-/// token-and-comment subsequence, each token read under `relation` — respelled to
-/// canonical under `UpToSpelling`, verbatim under `LayoutOnly` — a comment by its
-/// content, its trailing horizontal whitespace trimmed (syntax.md §11.1).
+/// token-and-comment subsequence, each token projected by the tier's [`compared`]
+/// under `relation` — the one home for the content-projection rule (syntax.md
+/// §11.1, §11.3), respelled to canonical under `UpToSpelling` and verbatim under
+/// `LayoutOnly`. Reading the projection there rather than re-deriving it keeps
+/// this certificate's notion of a token's identity — a line comment by its
+/// content, a script body by its value — exactly the layout certificate's, which
+/// `equivalent` reads through the same rule.
 type Signature = Vec<(SyntaxKind, String)>;
 
 fn signature(item: &Item, plan: &Plan, relation: Certificate) -> Signature {
     item.subsequence(plan)
         .iter()
-        .map(|token| {
-            let content = content_of(token);
-            let spelling = match relation {
-                Certificate::LayoutOnly => content,
-                Certificate::UpToSpelling => {
-                    canonical_spelling(token.kind(), &content).into_owned()
-                }
-            };
-            (token.kind(), spelling)
-        })
+        .map(|token| (token.kind(), compared(token, relation).into_owned()))
         .collect()
-}
-
-/// A token's content for comparison (syntax.md §11.1): its text, with a comment's
-/// trailing horizontal whitespace trimmed — the one thing about a comment that is
-/// layout, not content.
-fn content_of(token: &SyntaxToken) -> String {
-    if token.kind().is_comment() {
-        token.text().trim_end().to_owned()
-    } else {
-        token.text().to_owned()
-    }
 }
 
 #[cfg(test)]

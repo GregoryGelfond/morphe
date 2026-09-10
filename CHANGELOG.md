@@ -9,6 +9,28 @@ that breaks either bumps the major.
 
 ## [Unreleased]
 
+## [1.0.5] - 2026-09-10
+
+### Fixed
+
+- `morphe --reorder` no longer fails with an internal error on a program that
+  reorders any statement while carrying a `#script … #end.` whose body has trailing
+  spaces or tabs before `#end`. morphe re-emits such a body with those blanks
+  trimmed (its value), but the permutation proof compared the body's raw text, so
+  it saw the held `#script` barrier as moved and refused its own correct output
+  (exit `70`). The proof now reads each token's content through the syntax tier's
+  own projection — a script body by its value — the same rule the layout
+  certificate already applies, so the barrier certifies and the reorder succeeds.
+  Formatting without `--reorder` was never affected.
+
+### Internal
+
+- Rebuilt against a newer `themelios-syntax`, adopted by a deliberate rev-bump.
+  The tier's public surface was regularized — comment attachment now yields a typed
+  comment where it yielded a bare token — and morphe reads the same underlying
+  token from it, so comment placement, the layout, and the certificate are
+  unchanged.
+
 ## [1.0.4] - 2026-09-05
 
 ### Fixed
@@ -111,7 +133,8 @@ carries its own posture in `docs/security/threat-model.md`. Not yet on crates.io
 (it depends on `themelios-syntax` by path): build from source with the two
 repositories cloned as siblings. Rust 1.97+ (edition 2024).
 
-[Unreleased]: https://github.com/GregoryGelfond/morphe/compare/v1.0.4...HEAD
+[Unreleased]: https://github.com/GregoryGelfond/morphe/compare/v1.0.5...HEAD
+[1.0.5]: https://github.com/GregoryGelfond/morphe/compare/v1.0.4...v1.0.5
 [1.0.4]: https://github.com/GregoryGelfond/morphe/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/GregoryGelfond/morphe/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/GregoryGelfond/morphe/compare/v1.0.1...v1.0.2

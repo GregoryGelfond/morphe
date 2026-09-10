@@ -16,7 +16,6 @@
 //! convergence is pinned deterministically by
 //! [`a_neck_to_body_dangling_comment_reaches_a_fixed_point`].
 
-use morphe::themelios_syntax::ast::{AstToken, Comment};
 use morphe::themelios_syntax::attach::{Slot, attachments};
 use morphe::themelios_syntax::equiv::non_whitespace_tokens;
 use morphe::themelios_syntax::parse::parse;
@@ -79,9 +78,7 @@ fn plan_of(text: &str) -> Vec<(&'static str, String)> {
                 Slot::Trailing => "trailing",
                 Slot::Dangling => "dangling",
             };
-            let content = Comment::cast(comment.clone())
-                .map_or_else(|| comment.text().to_owned(), |c| c.content().to_owned());
-            (slot, content)
+            (slot, comment.content().to_owned())
         })
         .collect();
     facts.sort();
