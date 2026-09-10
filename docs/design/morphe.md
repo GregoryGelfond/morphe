@@ -126,7 +126,8 @@ The whole of syntax.md §15's formatter-facing surface:
   `lex_mode_of`, `Separator::{Nothing, Whitespace, LineBreak}`.
 - **Token-stream equivalence** (syntax.md §11) — `Certificate::{LayoutOnly,
   UpToSpelling}`, `equivalent`, `Mismatch`/`Side`, `non_whitespace_tokens`,
-  `token_stream`, `comment_sequence`, and `canonical_spelling`.
+  `token_stream`, `comment_sequence`, the token content-projection rule
+  `content`/`compared` (syntax.md §11.1), and `canonical_spelling`.
 - **`Dialect`** (syntax.md §3), and through the tier's re-export of base,
   the line index and the diagnostic views.
 

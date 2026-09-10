@@ -3,10 +3,9 @@
 # differential and the criterion benches are not here — they need the pixi
 # environment and run out of band (§13).
 #
-# morphe depends on themelios-syntax by a path (../../../themelios), so the two
-# repositories are checked out as siblings under the workspace; the path
-# resolves from morphe/crates/morphe to ../../../themelios. themelios is public,
-# so its checkout needs no credential beyond the workflow's default token.
+# morphe pins themelios-syntax to a public git revision (crates/morphe/Cargo.toml),
+# so cargo fetches the tier itself during the build — no sibling checkout of
+# themelios is needed.
 name: gate
 
 on:
@@ -24,12 +23,6 @@ jobs:
         uses: actions/checkout@v5
         with:
           path: morphe
-      - name: Check out themelios (the path dependency)
-        uses: actions/checkout@v5
-        with:
-          repository: GregoryGelfond/themelios
-          path: themelios
-          # themelios's default branch — the current tier morphe is held against.
       - name: Install the toolchain
         uses: dtolnay/rust-toolchain@stable
         with:

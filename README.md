@@ -174,12 +174,11 @@ fences that reordering won't cross.
 
 ## Installation
 
-morphe isn't on crates.io yet — it tracks `themelios-syntax` by a local path — so
-build it from source. Clone the two repositories **side by side** (morphe looks
-for the tier at `../themelios`):
+morphe isn't on crates.io yet — it pins `themelios-syntax` to a git revision — so
+build it from source. Clone the repository and build; cargo fetches the pinned
+tier revision for you:
 
 ```sh
-git clone https://github.com/GregoryGelfond/themelios.git
 git clone https://github.com/GregoryGelfond/morphe.git
 cd morphe
 cargo build --release          # the morphe binary at target/release/morphe
