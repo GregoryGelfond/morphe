@@ -9,6 +9,20 @@ that breaks either bumps the major.
 
 ## [Unreleased]
 
+## [1.0.7] - 2026-09-21
+
+No user-facing changes: the house style and the command-line surface behave
+exactly as in 1.0.6.
+
+### Internal
+
+- The pinned `themelios-syntax` revision advances to adopt the syntax tier's
+  additive `fusion` changes: a single-home keyword roster and punctuation
+  formation join the module, and the module now documents its shared lexical
+  facts. The `fusion` surface morphe consumes is unchanged and the resolved
+  behaviour is identical; the bump is deliberate and carries no API or behaviour
+  change.
+
 ## [1.0.6] - 2026-09-10
 
 No user-facing changes: the house style and the command-line surface behave
