@@ -9,6 +9,21 @@ that breaks either bumps the major.
 
 ## [Unreleased]
 
+## [1.0.8] - 2026-09-23
+
+No user-facing changes: the house style and the command-line surface behave
+exactly as in 1.0.7.
+
+### Internal
+
+- The pinned `themelios-syntax` revision advances to keep morphe current with
+  the tier's `main`. The advance carries a program-tier addition only — a new
+  `AnswerSet` alias and a multi-part `Program` constructor in
+  `themelios-program`, which morphe does not depend on. The `themelios-syntax`
+  surface morphe consumes is byte-identical across the bump and the resolved
+  behaviour is identical; the bump is deliberate, keeping morphe its tier's
+  first-consumer checkpoint, and carries no API or behaviour change.
+
 ## [1.0.7] - 2026-09-21
 
 No user-facing changes: the house style and the command-line surface behave
@@ -165,7 +180,9 @@ carries its own posture in `docs/security/threat-model.md`. Not yet on crates.io
 (it depends on `themelios-syntax` by path): build from source with the two
 repositories cloned as siblings. Rust 1.97+ (edition 2024).
 
-[Unreleased]: https://github.com/GregoryGelfond/morphe/compare/v1.0.6...HEAD
+[Unreleased]: https://github.com/GregoryGelfond/morphe/compare/v1.0.8...HEAD
+[1.0.8]: https://github.com/GregoryGelfond/morphe/compare/v1.0.7...v1.0.8
+[1.0.7]: https://github.com/GregoryGelfond/morphe/compare/v1.0.6...v1.0.7
 [1.0.6]: https://github.com/GregoryGelfond/morphe/compare/v1.0.5...v1.0.6
 [1.0.5]: https://github.com/GregoryGelfond/morphe/compare/v1.0.4...v1.0.5
 [1.0.4]: https://github.com/GregoryGelfond/morphe/compare/v1.0.3...v1.0.4
