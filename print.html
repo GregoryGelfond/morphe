@@ -1,0 +1,1138 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>The morphe Book</title>
+        <meta name="robots" content="noindex">
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="An opinionated, safety-certified formatter for Answer Set Programming: the house style, the meaning-preservation certificate, and the Rust library.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon-de23e50b.svg">
+        <link rel="shortcut icon" href="favicon-8114d1fc.png">
+        <link rel="stylesheet" href="css/variables-8adf115d.css">
+        <link rel="stylesheet" href="css/general-e96d0476.css">
+        <link rel="stylesheet" href="css/chrome-d279d366.css">
+        <link rel="stylesheet" href="css/print-9e4910d8.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="fonts/fonts-9644e21d.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="mdbook-highlight-css" href="highlight-493f70e1.css">
+        <link rel="stylesheet" id="mdbook-tomorrow-night-css" href="tomorrow-night-4c0ae647.css">
+        <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="ayu-highlight-3fdfc3ac.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "searchindex-f3f85809.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc-86b966e9.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="mdbook-body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="mdbook-sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("mdbook-sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="mdbook-sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="mdbook-sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="mdbook-page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="mdbook-menu-bar-hover-placeholder"></div>
+                <div id="mdbook-menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="mdbook-sidebar-toggle" class="icon-button" for="mdbook-sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="mdbook-sidebar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg></span>
+                        </label>
+                        <button id="mdbook-theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="mdbook-theme-list">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M371.3 367.1c27.3-3.9 51.9-19.4 67.2-42.9L600.2 74.1c12.6-19.5 9.4-45.3-7.6-61.2S549.7-4.4 531.1 9.6L294.4 187.2c-24 18-38.2 46.1-38.4 76.1L371.3 367.1zm-19.6 25.4l-116-104.4C175.9 290.3 128 339.6 128 400c0 3.9 .2 7.8 .6 11.6c1.8 17.5-10.2 36.4-27.8 36.4H96c-17.7 0-32 14.3-32 32s14.3 32 32 32H240c61.9 0 112-50.1 112-112c0-2.5-.1-5-.2-7.5z"/></svg></span>
+                        </button>
+                        <ul id="mdbook-theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-ayu">Ayu</button></li>
+                        </ul>
+                        <button id="mdbook-search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="mdbook-searchbar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352c79.5 0 144-64.5 144-144s-64.5-144-144-144S64 128.5 64 208s64.5 144 144 144z"/></svg></span>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">The morphe Book</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <span class=fa-svg id="print-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64H354.7L384 93.3V160h64V93.3c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0H128zM384 352v32 64H128V384 368 352H384zm64 32h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64H64c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H64v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V384zm-16-88c-13.3 0-24-10.7-24-24s10.7-24 24-24s24 10.7 24 24s-10.7 24-24 24z"/></svg></span>
+                        </a>
+                        <a href="https://github.com/GregoryGelfond/morphe" title="Git repository" aria-label="Git repository">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg></span>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="mdbook-search-wrapper" class="hidden">
+                    <form id="mdbook-searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="mdbook-searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="mdbook-searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <span class=fa-svg id="fa-spin"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M304 48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zm0 416c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM48 304c26.5 0 48-21.5 48-48s-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48zm464-48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM142.9 437c18.7-18.7 18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zm0-294.2c18.7-18.7 18.7-49.1 0-67.9S93.7 56.2 75 75s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zM369.1 437c18.7 18.7 49.1 18.7 67.9 0s18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9z"/></svg></span>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="mdbook-searchresults-outer" class="searchresults-outer hidden">
+                        <div id="mdbook-searchresults-header" class="searchresults-header"></div>
+                        <ul id="mdbook-searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('mdbook-sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('mdbook-sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#mdbook-sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="mdbook-content" class="content">
+                    <main>
+                        <h1 id="about-this-book"><a class="header" href="#about-this-book">About this book</a></h1>
+<p>morphe is an opinionated formatter for Answer Set Programming. It gives the
+clingo/clingcon dialect and the ASP-Core-2 standard one fixed house style — the
+way <code>rustfmt</code>, <code>black</code>, and <code>ruff</code> do for their languages — and it never changes
+what a program means: before it writes a file, it re-reads its own output and
+<em>proves</em> that only the layout changed (and, unless you ask otherwise, the spelling
+of interchangeable operators). If it cannot prove that, it writes nothing.</p>
+<p>This book covers using the <code>morphe</code> command, the house style and the safety
+argument behind it, and embedding morphe as a Rust library. morphe is built on
+<a href="https://github.com/GregoryGelfond/themelios">themelios-syntax</a> — the ASP program
+representation it parses and lays out — and it formats only: it never evaluates,
+grounds, or solves.</p>
+<h2 id="start-here"><a class="header" href="#start-here">Start here</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>I want to…</th><th>Read</th></tr>
+</thead>
+<tbody>
+<tr><td>See the whole idea in one worked example</td><td><a href="#a-guided-tour">A guided tour</a></td></tr>
+<tr><td>Understand how morphe proves it didn’t change my program</td><td><a href="#how-morphe-proves-it-didnt-change-your-program">How morphe proves it didn’t change your program</a></td></tr>
+<tr><td>Know exactly what the house style does</td><td><a href="#the-house-style">The house style</a></td></tr>
+<tr><td>Reorder my statements safely</td><td><a href="#reordering">Reordering</a></td></tr>
+<tr><td>Format the Python or Lua in my <code>#script</code> blocks</td><td><a href="#embedded-scripts">Embedded scripts</a></td></tr>
+<tr><td>Configure morphe for a project</td><td><a href="#configuration">Configuration</a></td></tr>
+<tr><td>Call morphe from Rust</td><td><a href="#getting-started">Getting started</a></td></tr>
+<tr><td>Look up a command or flag</td><td><a href="#using-the-morphe-command">Using the morphe command</a></td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="the-two-parts"><a class="header" href="#the-two-parts">The two parts</a></h2>
+<p><strong>Part I — The formatter</strong> is for the ASP author: what morphe guarantees and how it
+proves it, the house style construct by construct, how comments are kept with the
+code they annotate, the opt-in reorder, embedded <code>#script</code> formatting, and
+configuration. The <strong>morphe by example</strong> chapters run the whole thing on five real
+programs.</p>
+<p><strong>Part II — The Rust library</strong> is for the tool builder embedding morphe: the pure
+<code>format</code> API and the certificate it returns, the typed diagnostics and exit codes,
+and the contained boundary around the embedded formatters. morphe is a library
+first; the <code>morphe</code> command is a thin shell over it.</p>
+<h2 id="results-and-limits"><a class="header" href="#results-and-limits">Results and limits</a></h2>
+<p>morphe is a formatter, and only that:</p>
+<ul>
+<li><strong>It changes layout always</strong>, operator spelling unless <code>--preserve-spellings</code>,
+and statement order only under the opt-in <code>--reorder</code>. It never rewrites your
+encoding, and it never evaluates, grounds, or solves — those belong to other
+tools.</li>
+<li><strong>It proves it before it writes.</strong> Every format re-parses morphe’s own output and
+checks it against the input; if that check ever fails, morphe treats it as a bug
+in itself, reports an internal error, and writes nothing — see
+<a href="#how-morphe-proves-it-didnt-change-your-program">How morphe proves it didn’t change your program</a>.</li>
+<li><strong>Your comments stay put</strong>, next to the code they annotate, exactly as written —
+morphe does not even add a space after <code>%</code>.</li>
+<li><strong>Embedded <code>#script</code> bodies stay verbatim</strong> unless you opt in, and even then a
+backend’s output is bounded to the interior of its own script (see
+<a href="#embedded-scripts">Embedded scripts</a>).</li>
+</ul>
+<p>The design of record and the security posture live beside the book, not in it:
+<a href="https://github.com/GregoryGelfond/morphe/blob/main/docs/design/morphe.md"><code>docs/design/morphe.md</code></a>
+is the design of record, and
+<a href="https://github.com/GregoryGelfond/morphe/blob/main/docs/security/threat-model.md"><code>docs/security/threat-model.md</code></a>
+is the threat model the security review answers to.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="using-the-morphe-command"><a class="header" href="#using-the-morphe-command">Using the morphe command</a></h1>
+<p><code>morphe</code> is an opinionated formatter for Answer Set Programming. It formats the
+clingo/clingcon dialect and the ASP-Core-2 standard to one fixed house style, and
+it proves — before it writes — that it changed only the layout (see <a href="#how-morphe-proves-it-didnt-change-your-program">How morphe
+proves it didn’t change your program</a>).</p>
+<h2 id="formatting-in-place"><a class="header" href="#formatting-in-place">Formatting in place</a></h2>
+<p><code>morphe &lt;paths…&gt;</code> formats files and directories <strong>in place</strong>, recursively, matching
+<code>*.lp</code> and honoring <code>.gitignore</code>. Writes are <strong>atomic</strong> — morphe writes a temp file
+beside the target and renames over it — so an interrupted run never truncates a
+source.</p>
+<pre><code class="language-sh">morphe program.lp
+morphe src/
+</code></pre>
+<h2 id="checking-and-previewing"><a class="header" href="#checking-and-previewing">Checking and previewing</a></h2>
+<p>For CI and editors, two modes write nothing:</p>
+<pre><code class="language-sh">morphe --check program.lp   # exit 1 if it would change; writes nothing
+morphe --diff program.lp    # print a unified diff; writes nothing
+</code></pre>
+<h2 id="standard-input"><a class="header" href="#standard-input">Standard input</a></h2>
+<p>With <code>-</code>, morphe formats standard input to standard output, never in place:</p>
+<pre><code class="language-sh">cat program.lp | morphe -
+</code></pre>
+<p><code>--stdin-filename &lt;path&gt;</code> gives stdin an assumed path, so config discovery,
+dialect, and diagnostics behave as they would for that file — the editor hook.</p>
+<h2 id="options"><a class="header" href="#options">Options</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Option</th><th>Effect</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--check</code></td><td>Exit non-zero if the input would change; write nothing.</td></tr>
+<tr><td><code>--diff</code></td><td>Print a unified diff; write nothing.</td></tr>
+<tr><td><code>--line-width &lt;n&gt;</code></td><td>The one style knob (default 100).</td></tr>
+<tr><td><code>--dialect &lt;clingo|asp-core-2&gt;</code></td><td>The ASP dialect (default clingo).</td></tr>
+<tr><td><code>--preserve-spellings</code></td><td>Keep synonym spellings instead of normalizing them.</td></tr>
+<tr><td><code>--format-embedded</code> / <code>--no-format-embedded</code></td><td>Reformat <code>#script</code> bodies with their language’s tool, or keep them verbatim (the default).</td></tr>
+<tr><td><code>--reorder</code></td><td>Apply the opt-in <a href="#reordering">reorder</a>.</td></tr>
+<tr><td><code>--reorder-includes</code></td><td>Also hoist <code>#include</code> (unsafe; implies <code>--reorder</code>).</td></tr>
+<tr><td><code>--exclude &lt;glob&gt;</code> / <code>--extend-exclude &lt;glob&gt;</code></td><td>Skip matching files while walking a directory.</td></tr>
+<tr><td><code>--no-respect-gitignore</code></td><td>Walk files <code>.gitignore</code> / <code>.ignore</code> would exclude.</td></tr>
+<tr><td><code>--stdin-filename &lt;path&gt;</code></td><td>The assumed path for stdin.</td></tr>
+<tr><td><code>--config &lt;path&gt;</code></td><td>Read this config instead of discovering a <code>morphe.toml</code>.</td></tr>
+<tr><td><code>--isolated</code></td><td>Ignore any <code>morphe.toml</code>; use the built-in defaults and these flags alone.</td></tr>
+<tr><td><code>-q</code> / <code>--quiet</code>, <code>-v</code> / <code>--verbose</code></td><td>Less, or more, per-file reporting.</td></tr>
+<tr><td><code>--color &lt;auto|always|never&gt;</code></td><td>Terminal color (default auto; honors <code>NO_COLOR</code>).</td></tr>
+</tbody>
+</table>
+</div>
+<p><code>morphe --help</code> lists them all. Configuration is a <code>morphe.toml</code> discovered by
+walking up from each file; see <a href="#configuration">Configuration</a>.</p>
+<h2 id="exit-codes"><a class="header" href="#exit-codes">Exit codes</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Code</th><th>Meaning</th></tr>
+</thead>
+<tbody>
+<tr><td><code>0</code></td><td>Clean — already formatted, or formatted in place.</td></tr>
+<tr><td><code>1</code></td><td>Changes needed (under <code>--check</code> / <code>--diff</code>).</td></tr>
+<tr><td><code>2</code></td><td>Usage error — bad arguments or a malformed <code>morphe.toml</code>; also a parse refusal.</td></tr>
+<tr><td><code>70</code></td><td>Internal error — a bug in morphe; it never writes on this path.</td></tr>
+</tbody>
+</table>
+</div>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="a-guided-tour"><a class="header" href="#a-guided-tour">A guided tour</a></h1>
+<p>morphe takes an Answer Set Programming source file, gives it one fixed house
+style, and proves — before it writes — that it changed only the layout. This tour
+runs the whole motion on a small program; the house style is then shown construct
+by construct in <a href="#the-house-style">The house style</a>.</p>
+<h2 id="a-program-as-typed"><a class="header" href="#a-program-as-typed">A program, as typed</a></h2>
+<p>A small reachability encoding, typed the way programs really arrive — statements
+run together, spacing uneven, a comment or two:</p>
+<pre><code class="language-clingo">%reachability
+edge(1,2). edge(2,3).edge(3,4).
+reach(X,Y):-edge(X,Y).
+reach(X,Z):-reach(X,Y),edge(Y,Z).  %transitive
+#show reach/2.
+</code></pre>
+<h2 id="formatted"><a class="header" href="#formatted">Formatted</a></h2>
+<pre><code class="language-console">$ morphe reach.lp
+</code></pre>
+<pre><code class="language-clingo">%reachability
+edge(1, 2).
+edge(2, 3).
+edge(3, 4).
+reach(X, Y) :- edge(X, Y).
+reach(X, Z) :- reach(X, Y), edge(Y, Z). %transitive
+#show reach/2.
+</code></pre>
+<p>One statement per line; the neck <code>:-</code> and the commas spaced; and your comments
+left exactly where they were — morphe doesn’t even add a space after <code>%</code>.</p>
+<h2 id="what-just-happened--and-what-didnt"><a class="header" href="#what-just-happened--and-what-didnt">What just happened — and what didn’t</a></h2>
+<p>morphe changed <strong>layout only</strong>. Before it wrote the file, it re-parsed its own
+output and confirmed the result is the same program — the same statements and
+comments, in the same order, differing only in whitespace (and, unless you pass
+<code>--preserve-spellings</code>, the spelling of interchangeable operators). That check is
+not a mode you switch on; it is always on, and if it ever failed, morphe would
+report a bug in itself and write nothing. Your original file is never at risk. The
+next chapter, <a href="#how-morphe-proves-it-didnt-change-your-program">How morphe proves it didn’t change your program</a>, is
+that guarantee in full.</p>
+<p>morphe never rewrites your encoding, and it never evaluates, grounds, or solves —
+it lays text out and proves it left the meaning alone.</p>
+<p>Read on for <a href="#the-house-style">the house style</a> construct by construct, or jump to
+<a href="#using-the-morphe-command">any command</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="how-morphe-proves-it-didnt-change-your-program"><a class="header" href="#how-morphe-proves-it-didnt-change-your-program">How morphe proves it didn’t change your program</a></h1>
+<p>A formatter that silently changed what a program computes would be worse than
+useless. morphe’s promise — that it changes only how your program <em>looks</em> — is not
+asserted, it is <strong>checked</strong>, every time, before any output is written.</p>
+<h2 id="the-claim"><a class="header" href="#the-claim">The claim</a></h2>
+<p>For a program morphe can parse (a <em>member</em>), its output stands in one of exactly
+two relations to the input, and morphe proves which one holds before returning it:</p>
+<ul>
+<li><strong><code>LayoutOnly</code></strong> — nothing but whitespace changed;</li>
+<li><strong><code>UpToSpelling</code></strong> — as <code>LayoutOnly</code>, except that interchangeable operators were
+normalized to a canonical spelling, and nothing else.</li>
+</ul>
+<p>Which relation is the target follows from what you asked for, not from an
+independent switch: by default morphe normalizes spellings and proves
+<code>UpToSpelling</code>; under <code>--preserve-spellings</code> it keeps your spellings and proves the
+stricter <code>LayoutOnly</code>.</p>
+<h2 id="the-certificate"><a class="header" href="#the-certificate">The certificate</a></h2>
+<p>The proof is a <strong>certificate</strong>, and morphe earns it the hard way: it re-parses its
+own candidate output and compares that against the input. The comparison runs over
+the single interleaved sequence of everything significant — the program’s tokens
+and its comments, in order. A granted certificate therefore means <em>the same
+tokens and the same comments, each still standing where it stood among the
+others</em>. A comment that slid across a token, a rule that changed shape, an
+operator that became something it is not — each is a different sequence, and each
+is refused.</p>
+<p>This is why morphe trusts nothing about its own machinery. It does not assume the
+lowering was faithful or the renderer correct; it reads the output back and checks.</p>
+<h2 id="it-is-always-on-never-a-mode"><a class="header" href="#it-is-always-on-never-a-mode">It is always on, never a mode</a></h2>
+<p>The certificate is not a <code>--safe</code> flag you have to remember. <code>format</code> runs the
+check every time and <strong>cannot return output it did not certify</strong>. If the check
+ever fails, that is a bug in morphe — never a fault in your file — so morphe says
+so plainly: it reports an internal error, prints a bug-report request, and writes
+nothing. Your original file is untouched. In the library this is the typed
+<code>FormatError::CertificateBroke</code>; at the command line it is exit code <code>70</code>.</p>
+<h2 id="the-oracle-a-floor-morphe-cannot-undercut"><a class="header" href="#the-oracle-a-floor-morphe-cannot-undercut">The oracle: a floor morphe cannot undercut</a></h2>
+<p>The house style decides the whitespace it <em>wants</em> between two tokens. A separate
+authority from themelios-syntax — the <strong>fusion oracle</strong> — decides the <em>minimum</em> any
+correct formatter must leave, so two tokens can never fuse into a third thing:
+<code>0</code> and <code>x1</code> never become <code>0x1</code>, <code>#sum</code> and <code>+</code> never become <code>#sum+</code>, <code>.</code> and <code>.</code>
+never become <code>..</code>. Where the style and the oracle differ, morphe emits the
+maximum. The oracle is a floor the style may exceed but never fall below, and the
+certificate is the whole-program backstop should the floor ever be mis-queried.
+morphe keeps no spacing table of its own.</p>
+<h2 id="formatting-twice-changes-nothing-more"><a class="header" href="#formatting-twice-changes-nothing-more">Formatting twice changes nothing more</a></h2>
+<p>morphe is <strong>idempotent</strong>: formatting an already-formatted program returns it
+unchanged — <code>format(format(x)) == format(x)</code>. It follows because the house style
+is a function of the program’s structure, which re-parsing recovers exactly;
+comments re-attach to the same anchor; and spelling normalization is itself
+idempotent. This is not assumed — it is a property tested across a corpus, because
+it is exactly the invariant a careless comment-reattachment would break.</p>
+<h2 id="a-program-morphe-cant-parse"><a class="header" href="#a-program-morphe-cant-parse">A program morphe can’t parse</a></h2>
+<p>If a file has parse errors it is a <em>non-member</em>, and morphe <strong>refuses it whole</strong>
+rather than format around the broken regions: it reports the parser’s diagnostics
+and touches nothing. Formatting a half-typed buffer is a deliberate future
+capability, not something v1 guesses at.</p>
+<h2 id="depth"><a class="header" href="#depth">Depth</a></h2>
+<p>morphe parses at themelios-syntax’s default nesting limit, so a program nested
+deeper than that bound is refused as a parse error rather than risking the stack;
+within the limit, every walk morphe makes runs comfortably on an ordinary thread.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="the-house-style"><a class="header" href="#the-house-style">The house style</a></h1>
+<p>morphe has one fixed style. The only thing you set is the line width; everything
+else — spacing, indentation, where a line breaks — is decided for you, so the only
+question a diff ever raises is what changed in the <em>program</em>, never whose
+formatting preferences won. This chapter is that style, construct by construct.
+Every block below is real morphe output.</p>
+<h2 id="the-global-shape"><a class="header" href="#the-global-shape">The global shape</a></h2>
+<ul>
+<li><strong>The one knob is <code>line_width</code></strong> (default 100). Nothing else about layout is
+configurable.</li>
+<li><strong>One statement per line</strong>, terminated by its <code>.</code> (or an ASP-Core-2 query’s <code>?</code>).</li>
+<li><strong>Four-space indentation</strong>, never tabs.</li>
+<li><strong>Blank-line runs collapse to a single blank</strong>, and the file ends in exactly one
+newline:</li>
+</ul>
+<pre><code class="language-clingo">a.
+
+b.
+</code></pre>
+<h2 id="spacing-follows-bracket-depth"><a class="header" href="#spacing-follows-bracket-depth">Spacing follows bracket depth</a></h2>
+<p>The signature rule, and the one worth learning first: a <code>,</code> or <code>;</code> separator is
+<strong>spaced at the top level and one bracket deep, and tightens from two brackets in</strong>.</p>
+<pre><code class="language-clingo">h :- a, b.
+p(X, Y).
+q(f(a,b)).
+</code></pre>
+<p><code>a, b</code> (a rule body, top level) and <code>X, Y</code> (one bracket deep) are spaced; the
+<code>a,b</code> inside <code>f(…)</code> inside <code>q(…)</code> is two deep, so it hugs. A <strong>term operator</strong> is
+spaced only at the top level and tight inside any bracket:</p>
+<pre><code class="language-clingo">x :- X = Y + Z.
+p(X+Y).
+</code></pre>
+<p>The interval <code>..</code> is a term operator, so it takes the same rule — spaced at the top
+level, tight inside a bracket. (clingo parses <code>1 .. 3</code> and <code>1..3</code> identically; one
+rule governs every binary operator.)</p>
+<pre><code class="language-clingo">r(X) :- X = 1 .. 3.
+p(1..3).
+</code></pre>
+<p>Three spacings never vary with depth: a <strong>relation</strong> (a comparison or guard) is
+always spaced; <strong><code>not</code></strong> is always spaced from its operand; and a <strong>unary <code>-</code> or
+<code>~</code></strong> always hugs it.</p>
+<pre><code class="language-clingo">q(-1).
+a :- not b.
+</code></pre>
+<h2 id="necks-aggregates-disjunction"><a class="header" href="#necks-aggregates-disjunction">Necks, aggregates, disjunction</a></h2>
+<p>The neck <code>:-</code> and the weak-constraint neck <code>:~</code> are spaced on both sides. Aggregate
+and set braces are spaced <em>inside</em>, the aggregate keyword hugs its brace, elements
+are separated by <code>; </code>, and a condition’s <code>:</code> is spaced. <code>#minimize</code> and <code>#maximize</code>
+lay out exactly like an aggregate.</p>
+<pre><code class="language-clingo">1 { assigned(A,T) : agent(A), compat(A,T) } 1 :- task(T).
+#minimize{ C, A, T : assigned(A,T), cost(A,T,C) }.
+</code></pre>
+<p>A disjunctive head is spaced at its separator (<code>win(X) ; lose(X)</code>, in
+<a href="#wrapping-a-wide-rule">Wrapping a wide rule</a>). A signature <code>/</code> and a priority
+<code>@</code> hug:</p>
+<pre><code class="language-clingo">#show p/2.
+:~ q(X). [1@2, X]
+</code></pre>
+<h2 id="breaking-a-line-thats-too-wide"><a class="header" href="#breaking-a-line-thats-too-wide">Breaking a line that’s too wide</a></h2>
+<p>When a construct fits, it stays on one line. When it doesn’t, morphe breaks it at
+its <strong>list or chain</strong> separator — a body’s commas, an argument list’s, an
+aggregate’s <code>;</code>, a disjunction’s separator, an operator chain’s operators — one
+element per line, indented one level. A <strong>relation</strong> is not such a separator: a
+long comparison chain stays on its line, and a wide operand breaks within itself.
+<a href="#wrapping-a-wide-rule">Wrapping a wide rule</a> shows the motion in full.</p>
+<h2 id="the-trailing-separator"><a class="header" href="#the-trailing-separator">The trailing separator</a></h2>
+<p>morphe does not treat a trailing comma as a signal, the way <code>black</code>’s “magic
+trailing comma” does. A trailing separator is <strong>preserved and laid out by width
+alone</strong> — kept when the group fits, exploded with the group when it doesn’t. This
+matters in ASP because a trailing comma is not always inert: a one-tuple <code>(a,)</code> is
+a different term from the parenthesized <code>(a)</code>, and morphe keeps that distinction
+exactly.</p>
+<pre><code class="language-clingo">u((a,)).
+v((a)).
+</code></pre>
+<p>morphe never <em>adds</em> a trailing separator, and an argument list may not carry one
+(<code>f(a,)</code> is not a valid program).</p>
+<h2 id="what-morphe-never-reflows"><a class="header" href="#what-morphe-never-reflows">What morphe never reflows</a></h2>
+<p>Three regions are content, not layout, and are emitted verbatim:</p>
+<ul>
+<li><strong><code>%!</code> documentation lines</strong>, kept above their statement;</li>
+<li><strong><code>#script</code> bodies</strong> (unless you opt into <a href="#embedded-scripts">embedded formatting</a>);</li>
+<li><strong>the text of every comment</strong> — morphe trims only trailing whitespace on a
+comment line, and never the text, not even the space after <code>%</code>.</li>
+</ul>
+<p>See <a href="#comments">Comments</a> for how a comment is kept with the code it annotates.</p>
+<h2 id="spelling"><a class="header" href="#spelling">Spelling</a></h2>
+<p>Unless you pass <code>--preserve-spellings</code>, morphe normalizes interchangeable operator
+spellings to one canonical form — <code>==</code> becomes <code>=</code>, <code>&lt;&gt;</code> becomes <code>!=</code>, and
+<code>#minimise</code> / <code>#maximise</code> become <code>#minimize</code> / <code>#maximize</code> — converging on what
+clingo prints. That is the one change beyond whitespace morphe makes, and it is
+what moves the certificate from <code>LayoutOnly</code> to <code>UpToSpelling</code> (see
+<a href="#how-morphe-proves-it-didnt-change-your-program">How morphe proves it didn’t change your program</a>). Which spellings
+count as synonyms is themelios-syntax’s knowledge, not morphe’s.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="comments"><a class="header" href="#comments">Comments</a></h1>
+<p>Comments are the hardest thing a formatter handles, and the usual place one goes
+wrong — sliding a comment onto the wrong line, or reflowing on the second run what
+it left alone on the first. morphe is built so neither can happen.</p>
+<h2 id="comments-ride-with-the-code-they-annotate"><a class="header" href="#comments-ride-with-the-code-they-annotate">Comments ride with the code they annotate</a></h2>
+<p>morphe does not decide what a comment “belongs to” — themelios-syntax already reads
+that from the source, giving every comment an <strong>anchor</strong> (the statement or token it
+attaches to) and a <strong>slot</strong>:</p>
+<ul>
+<li><strong>Leading</strong> — on its own line(s) directly above the thing it annotates;</li>
+<li><strong>Trailing</strong> — on the same line, after it;</li>
+<li><strong>Dangling</strong> — inside a construct, before its closing bracket, or held apart by a
+blank line.</li>
+</ul>
+<p>morphe’s job is the inverse of reading them: it emits each comment in the position
+that makes a re-parse attach it to <em>the same anchor and slot</em>. A leading comment
+stays a tight run directly above its anchor; a trailing comment stays on the
+anchor’s last line; a dangling comment stays inside its construct. Nothing crosses
+the code it sits beside.</p>
+<pre><code class="language-clingo">%reachability
+edge(1, 2).
+reach(X, Y) :- edge(X, Y). %transitive
+</code></pre>
+<p>The <code>%reachability</code> header stays leading, the <code>%transitive</code> note stays trailing on
+its rule — and morphe does not even add a space after <code>%</code>.</p>
+<h2 id="blank-lines"><a class="header" href="#blank-lines">Blank lines</a></h2>
+<p>A blank line you put between two statements is kept (a run of several collapses to
+one). A blank line you put <em>after</em> a comment to hold it apart from what follows is
+kept too, because that blank is what tells the parser the comment stands on its
+own. morphe treats blank lines and comment placement as one concern, so it never
+introduces a blank that would re-attach a comment, nor removes one you placed to
+separate it.</p>
+<h2 id="the-one-place-a-comment-is-re-slotted"><a class="header" href="#the-one-place-a-comment-is-re-slotted">The one place a comment is re-slotted</a></h2>
+<p>There is a single, deliberate exception. A comment written <em>between a rule’s neck
+and its body</em> — when the body is wide enough that morphe breaks it onto its own
+line — cannot leave a blank line stranded in the middle of one rule. morphe rides
+the comment down with the body, on its own line just above it, so it reads as a
+leading comment on that body. The program is unchanged — the comment still sits
+between the neck and the body — and formatting again changes nothing more.</p>
+<h2 id="why-this-is-safe"><a class="header" href="#why-this-is-safe">Why this is safe</a></h2>
+<p>Two things guarantee it. First, because morphe always emits a comment right beside
+the anchor the parser gave it, a comment can never jump the token it leads or
+trails — so the transposition that plagues naïve formatters is unreachable. Second,
+the certificate is the backstop: any placement that <em>did</em> move a comment across a
+token would change the program’s interleaved sequence of tokens and comments, and
+morphe would refuse it before writing a byte (see
+<a href="#how-morphe-proves-it-didnt-change-your-program">How morphe proves it didn’t change your program</a>).</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="reordering"><a class="header" href="#reordering">Reordering</a></h1>
+<p>By default morphe never changes the order of your statements — order can carry
+meaning in ASP, and <code>format</code> holds it exactly. Reordering is a <strong>separate, opt-in</strong>
+operation: pass <code>--reorder</code> (or set <code>reorder = true</code>) and morphe also tidies the
+order of your statements into a canonical shape — proving, as always, that it only
+moved them.</p>
+<h2 id="what-it-does"><a class="header" href="#what-it-does">What it does</a></h2>
+<pre><code class="language-clingo">#show reach/1.
+reach(Y) :- reach(X), edge(X, Y).
+#defined edge/2.
+reach(X) :- start(X).
+#const max = 3.
+</code></pre>
+<pre><code class="language-console">$ morphe --reorder program.lp
+</code></pre>
+<pre><code class="language-clingo">#defined edge/2.
+#const max = 3.
+reach(Y) :- reach(X), edge(X, Y).
+reach(X) :- start(X).
+#show reach/1.
+</code></pre>
+<p>The canonical order is the program’s <em>signature</em>, read top to bottom: <strong><code>#defined</code></strong>
+(the input signature) → <strong><code>#const</code></strong> (the parameters) → <strong>the rules and everything
+else</strong>, in their original source order → <strong><code>#show</code></strong> (the output signature). The
+rules keep their relative order; only the signature directives move to their groups.</p>
+<p>A statement carries its documentation and its leading and trailing comments with it
+when it moves — morphe moves whole <em>units</em>, comments included, never bare lines.</p>
+<h2 id="what-stays-put-barriers"><a class="header" href="#what-stays-put-barriers">What stays put: barriers</a></h2>
+<p>Some statements can’t be moved without risking a change in meaning, and morphe
+treats each as a <strong>barrier</strong> — held in place, never reordered across. Reordering
+happens only <em>within</em> the regions the barriers divide. A top-level element is a
+barrier exactly when its position can affect the program’s answer sets, including
+through content morphe cannot see:</p>
+<ul>
+<li><strong><code>#include</code></strong> — a textual splice of another file whose contents morphe never
+resolves (see below);</li>
+<li><strong><code>#program</code></strong>, <strong><code>#script</code></strong>, and an overriding <strong><code>#const</code></strong> — each governs the
+statements around it by position;</li>
+<li>an <strong>ASP-Core-2 query</strong>, which must remain the program’s final statement;</li>
+<li>a <strong>floating top-level comment</strong>, which stays where you put it.</li>
+</ul>
+<h2 id="the-proof"><a class="header" href="#the-proof">The proof</a></h2>
+<p>A reorder deliberately changes the program’s text, so the layout certificate would
+(correctly) refuse it — and morphe earns a <em>different</em> guarantee instead, a
+<strong>permutation certificate</strong>. After reordering, morphe re-parses its own output and
+checks a total, both-ways match: every original statement present exactly once,
+nothing added, dropped, or split, and every barrier still holding its place and its
+neighbours. Each moved statement is also individually layout-certified, exactly as
+<code>format</code> certifies it. If any of that fails, morphe treats it as a bug in itself,
+reports an internal error, and leaves your file untouched.</p>
+<h2 id="include-and-the-one-unsafe-toggle"><a class="header" href="#include-and-the-one-unsafe-toggle"><code>#include</code>, and the one unsafe toggle</a></h2>
+<p>Because morphe never resolves an <code>#include</code>, it cannot see whether the included file
+carries something order-sensitive — so by default <code>#include</code> is a barrier. If you
+know your includes are pure (the common “library of definitions” discipline), you
+can lift that restriction with <code>--reorder-includes</code> (or <code>[unsafe] reorder_includes = true</code>), which hoists <code>#include</code> to the front with the other signature directives.
+morphe cannot prove this safe, so it never does it silently: whenever the toggle
+actually moves an <code>#include</code>, morphe emits a warning that names the move and states
+it rests on your unverified assertion. It is the one transform in morphe that rests
+on your word rather than a morphe proof.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="embedded-scripts"><a class="header" href="#embedded-scripts">Embedded scripts</a></h1>
+<p>A clingo program can embed Python or Lua in a <code>#script(python) … #end.</code> block.
+That body is opaque to the ASP parser — and, by default, opaque to morphe: it is
+kept <strong>byte-for-byte verbatim</strong> while the ASP around it is formatted.</p>
+<pre><code class="language-clingo">count(N) :- N = #count{ X : item(X) }.
+#script(python)
+def main( prg ):
+        prg.ground([("base",[])])
+        prg.solve()
+#end.
+item(a).
+item(b).
+</code></pre>
+<p>The rules and facts are laid out in the house style; the Python is left exactly as
+written, down to its spacing and indentation. morphe touches a <code>#script</code> body only
+if you ask.</p>
+<h2 id="opt-in-formatting"><a class="header" href="#opt-in-formatting">Opt-in formatting</a></h2>
+<p>Turn embedded formatting on and morphe hands each script body to that language’s
+own formatter — <strong>ruff</strong> for Python, <strong>StyLua</strong> for Lua — and splices the result
+back in. It is gated twice, so the lean default costs nothing:</p>
+<ul>
+<li><strong>At build time</strong>, the backends live behind the Cargo features <code>embedded-python</code>
+and <code>embedded-lua</code>; a build without them compiles neither tool nor its
+dependencies.</li>
+<li><strong>At run time</strong>, it is still off unless you pass <code>--format-embedded</code>.</li>
+</ul>
+<h2 id="the-safety-composed"><a class="header" href="#the-safety-composed">The safety, composed</a></h2>
+<p>morphe’s certificate is a statement about your <em>ASP program</em>, and reformatting a
+script body changes that body’s text — so an embedded change is, by construction,
+outside the layout-only guarantee. morphe keeps the two cleanly separated and
+proves each in its own way:</p>
+<ol>
+<li><strong>The ASP program is certified with every body held verbatim</strong> — the same
+guarantee as an ordinary format, and it holds <em>no matter what a backend does</em>.</li>
+<li><strong>Each script interior is delegated</strong> to the backend’s own meaning-preservation
+(StyLua’s full re-parse check; ruff’s stability, plus morphe’s own re-parse of
+the result). morphe treats ruff and StyLua as tools trusted for their own
+language, not as things it re-derives.</li>
+<li><strong>morphe binds the two together</strong>: after formatting the bodies, it re-parses the
+whole file and confirms the ASP token structure is <em>identical</em> to the certified
+skeleton, differing only inside the script bodies. If a backend’s output
+disturbed anything outside its own script, that body reverts to verbatim.</li>
+</ol>
+<p>The upshot: a bug — or even hostile output — in ruff or StyLua can never reach your
+ASP program. The worst it can do is change the interior of its own script, and the
+structural check bounds even that.</p>
+<h2 id="when-a-backend-cant-or-wont"><a class="header" href="#when-a-backend-cant-or-wont">When a backend can’t, or won’t</a></h2>
+<p>Every way a backend can fail — the language unsupported, the backend absent, the
+body rejected, its own check failed, or a panic caught at the boundary — collapses
+to a single outcome: <strong>that body stays verbatim, a warning is recorded, and nothing
+stops.</strong> One failed script never halts the others or the ASP format, and across a
+batch one file’s failure never aborts the run. Embedded outcomes are warnings; they
+never change morphe’s exit code. A failure lands exactly where the safe default is,
+never anywhere worse.</p>
+<p>The residuals an in-process formatter cannot fully bound are a backend that <em>hangs</em>
+(unbounded time) and one that exhausts <em>memory</em> (unbounded allocation): there is no
+timeout and no allocation cap on the in-process call, and the two need different
+remedies — a watchdog bounds time, but only a subprocess under an OS resource limit
+bounds memory. Neither is reachable on real script bodies, and the escape hatch, if
+one is ever needed, is a watchdog or an opt-in subprocess backend behind the same
+seam, with no change to morphe’s core. The full account is in the
+<a href="https://github.com/GregoryGelfond/morphe/blob/main/docs/security/threat-model.md">threat model</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="configuration"><a class="header" href="#configuration">Configuration</a></h1>
+<p>morphe’s style is fixed on purpose: there is one layout knob — the line width — and
+nothing else about how code lays out is configurable. What a <code>morphe.toml</code> sets is
+that one knob, the dialect, and which sound transforms run.</p>
+<h2 id="morphetoml-and-how-its-found"><a class="header" href="#morphetoml-and-how-its-found"><code>morphe.toml</code>, and how it’s found</a></h2>
+<p>Drop a <code>morphe.toml</code> beside your code. morphe discovers it by walking up from each
+file it formats, so one file at a project’s root configures the whole tree:</p>
+<pre><code class="language-toml">line_width = 100
+dialect = "clingo"          # or "asp-core-2"
+preserve_spellings = false
+format_embedded = false
+reorder = false
+
+# The one setting that can affect meaning lives on its own (see below).
+[unsafe]
+reorder_includes = false
+</code></pre>
+<p>Those are all the keys. An <strong>unknown key is a usage error</strong>, not a silently
+ignored typo:</p>
+<pre><code class="language-console">$ morphe program.lp
+morphe: ./morphe.toml: unknown field `line_wdith`, expected one of `line_width`, `dialect`, `preserve_spellings`, `format_embedded`, `reorder`, `unsafe`
+</code></pre>
+<p>A command-line flag overrides the file. <code>--config &lt;path&gt;</code> reads a specific file
+instead of discovering one; <code>--isolated</code> ignores any <code>morphe.toml</code> entirely and
+uses the built-in defaults with only the flags you pass.</p>
+<h2 id="safe-and-unsafe"><a class="header" href="#safe-and-unsafe">Safe and unsafe</a></h2>
+<p>The keys divide into two kinds. The ordinary ones select a <strong>morphe-proved</strong>
+transform — <code>reorder</code>, for instance, moves whole statements and proves it only
+permuted them (see <a href="#reordering">Reordering</a>). One key is different, and it lives in
+its own <code>[unsafe]</code> table to say so: <strong><code>reorder_includes</code></strong> lets the reorder hoist an
+<code>#include</code> past other statements. morphe cannot prove that safe — it never resolves
+an include, so it cannot see what the included file contributes — and the transform
+rests on <em>your</em> assertion that your includes carry nothing order-sensitive. When
+<code>reorder_includes</code> actually moves an <code>#include</code>, morphe emits a warning that names
+the move and states it rests on that unverifiable assertion. Everything in
+<code>[unsafe]</code> is a capability you turn on for your own program: never a default, never
+silent.</p>
+<p>The split is orthogonal to style — these toggles choose <em>which sound transforms
+run</em>, never <em>how code lays out</em> — so morphe stays as opinionated about appearance
+as <code>black</code> or <code>gofmt</code>.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="formatting-a-program"><a class="header" href="#formatting-a-program">Formatting a program</a></h1>
+<p>The everyday case: run-together statements and loose spacing become one clean,
+consistent program. Nothing but layout changes.</p>
+<pre><code class="language-clingo">%reachability
+edge(1,2). edge(2,3).edge(3,4).
+reach(X,Y):-edge(X,Y).
+reach(X,Z):-reach(X,Y),edge(Y,Z).  %transitive
+#show reach/2.
+</code></pre>
+<pre><code class="language-console">$ morphe reach.lp
+</code></pre>
+<pre><code class="language-clingo">%reachability
+edge(1, 2).
+edge(2, 3).
+edge(3, 4).
+reach(X, Y) :- edge(X, Y).
+reach(X, Z) :- reach(X, Y), edge(Y, Z). %transitive
+#show reach/2.
+</code></pre>
+<p>One statement per line, the neck <code>:-</code> and the commas spaced, and the comments left
+exactly where they were. morphe checked all of this against your program before it
+wrote the file.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="choice-rules-and-aggregates"><a class="header" href="#choice-rules-and-aggregates">Choice rules and aggregates</a></h1>
+<p>Choice rules, aggregates, and conditions — the constructs real encodings are built
+from — get a consistent shape. However you type this assignment rule, morphe gives
+it one form.</p>
+<pre><code class="language-clingo">1{assigned(A,T):agent(A),compat(A,T)}1:-task(T).
+#minimize{C,A,T:assigned(A,T),cost(A,T,C)}.
+</code></pre>
+<pre><code class="language-console">$ morphe assign.lp
+</code></pre>
+<pre><code class="language-clingo">1 { assigned(A,T) : agent(A), compat(A,T) } 1 :- task(T).
+#minimize{ C, A, T : assigned(A,T), cost(A,T,C) }.
+</code></pre>
+<p>The count-and-brace bounds are spaced, the braces are spaced inside, a condition’s
+<code>:</code> is spaced, and an aggregate keyword like <code>#minimize</code> hugs its brace. Inside
+<code>assigned(A,T)</code> the argument comma hugs — it is two brackets deep, by the
+<a href="#spacing-follows-bracket-depth">bracket-depth rule</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="constraint-atoms-clingcon"><a class="header" href="#constraint-atoms-clingcon">Constraint atoms (clingcon)</a></h1>
+<p>morphe formats clingcon’s constraint atoms too, with the same fixed style. Here is
+an N-queens model built from them — one queen per row, none sharing a column or a
+diagonal.</p>
+<pre><code class="language-clingo">#const n=8.
+row(1..n).
+% q(R): the column of the queen in row R.
+&amp;dom{1..n}=q(R):-row(R).
+&amp;distinct{q(R):row(R)}.
+&amp;distinct{q(R)-R:row(R)}.
+&amp;distinct{q(R)+R:row(R)}.
+</code></pre>
+<pre><code class="language-console">$ morphe queens.lp
+</code></pre>
+<pre><code class="language-clingo">#const n = 8.
+row(1..n).
+% q(R): the column of the queen in row R.
+&amp;dom{ 1 .. n } = q(R) :- row(R).
+&amp;distinct{ q(R) : row(R) }.
+&amp;distinct{ q(R) - R : row(R) }.
+&amp;distinct{ q(R) + R : row(R) }.
+</code></pre>
+<p>The <code>&amp;</code>-atom’s head hugs its brace, the brace is spaced inside like an aggregate’s,
+and the guard <code>=</code> is spaced like any relation. The theory terms inside keep their
+operators spaced — <code>1 .. n</code>, <code>q(R) - R</code>, <code>q(R) + R</code>.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="wrapping-a-wide-rule"><a class="header" href="#wrapping-a-wide-rule">Wrapping a wide rule</a></h1>
+<p>A statement that fits the line width stays on one line:</p>
+<pre><code class="language-console">$ morphe game.lp
+</code></pre>
+<pre><code class="language-clingo">win(X) ; lose(X) :- player(X), move(X, Y), not win(Y), reachable(X).
+</code></pre>
+<p>When a rule is wider than the line width, morphe breaks its body one element per
+line, so the structure stays legible instead of running off the screen:</p>
+<pre><code class="language-console">$ morphe --line-width 40 game.lp
+</code></pre>
+<pre><code class="language-clingo">win(X) ; lose(X) :-
+    player(X),
+    move(X, Y),
+    not win(Y),
+    reachable(X).
+</code></pre>
+<p>The head stays on the first line, the body breaks after the neck, and each goal
+sits on its own indented line. Only the layout changed — the same certificate is
+checked whether the rule fits or wraps.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="reordering-a-program"><a class="header" href="#reordering-a-program">Reordering a program</a></h1>
+<p>By default morphe leaves your statements exactly where they are. Add <code>--reorder</code>
+and it also tidies their order, grouping them into the canonical signature shape
+and proving it only moved them.</p>
+<pre><code class="language-clingo">#show reach/1.
+reach(Y) :- reach(X), edge(X, Y).
+#defined edge/2.
+reach(X) :- start(X).
+#const max = 3.
+</code></pre>
+<pre><code class="language-console">$ morphe --reorder program.lp
+</code></pre>
+<pre><code class="language-clingo">#defined edge/2.
+#const max = 3.
+reach(Y) :- reach(X), edge(X, Y).
+reach(X) :- start(X).
+#show reach/1.
+</code></pre>
+<p><code>#defined</code> leads, <code>#const</code> follows, the rules keep their source order in the
+middle, and <code>#show</code> goes last. Statements whose order can matter — and every
+<code>#include</code> — stay put and act as fences the reorder won’t cross. See
+<a href="#reordering">Reordering</a> for the full rules and the permutation proof.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="getting-started"><a class="header" href="#getting-started">Getting started</a></h1>
+<p>morphe is a library first; the <code>morphe</code> command is a thin shell over it. A tool
+embeds the formatter directly and gets the formatted text — and the certificate it
+earned — with no process boundary and no text protocol in between. The core is
+pure and does no I/O.</p>
+<h2 id="add-the-dependency"><a class="header" href="#add-the-dependency">Add the dependency</a></h2>
+<p>morphe isn’t on crates.io yet (it pins <code>themelios-syntax</code> to a git revision), so
+depend on it by git:</p>
+<pre><code class="language-toml">[dependencies]
+morphe = { git = "https://github.com/GregoryGelfond/morphe" }
+</code></pre>
+<h2 id="format-a-program"><a class="header" href="#format-a-program">Format a program</a></h2>
+<p><code>format</code> takes a <code>Source</code> and <code>FormatOptions</code> and returns a <code>Formatted</code> — the text
+plus the certificate morphe proved — or a typed <code>FormatError</code>:</p>
+<pre class="playground"><code class="language-rust edition2024"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use morphe::themelios_syntax::base::source::SourceId;
+use morphe::{format, FormatOptions, Source};
+
+let text = "edge(1,2). edge(2,3).\nreach(X,Y):-edge(X,Y).\n";
+let source = Source::new(SourceId::new(0), text.to_owned())
+    .expect("input within Source::MAX_LEN");
+
+match format(&amp;source, &amp;FormatOptions::default()) {
+    Ok(formatted) =&gt; print!("{}", formatted.text),
+    Err(error) =&gt; eprintln!("morphe refused: {error:?}"),
+}
+<span class="boring">}</span></code></pre>
+<p>prints</p>
+<pre><code class="language-clingo">edge(1, 2).
+edge(2, 3).
+reach(X, Y) :- edge(X, Y).
+</code></pre>
+<p><code>FormatOptions::default()</code> is the house style at width 100, clingo dialect, every
+transform off. The whole ASP vocabulary morphe needs — <code>Source</code>, <code>Parse</code>,
+<code>Program</code>, <code>Dialect</code>, the <code>Certificate</code> — is re-exported through morphe (and the
+tier itself as <code>morphe::themelios_syntax</code>), so a consumer names it through morphe
+alone. The next chapters cover <a href="#the-format-api-and-the-certificate">the <code>Formatted</code> value and the
+certificate</a> and <a href="#diagnostics-and-exit-codes">the diagnostics and exit codes</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="the-format-api-and-the-certificate"><a class="header" href="#the-format-api-and-the-certificate">The format API and the certificate</a></h1>
+<p>morphe’s core is three pure functions and the values they return.</p>
+<h2 id="the-entry-points"><a class="header" href="#the-entry-points">The entry points</a></h2>
+<pre class="playground"><code class="language-rust edition2024"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn format(source: &amp;Source, options: &amp;FormatOptions)
+    -&gt; Result&lt;Formatted, FormatError&gt;;
+
+pub fn format_parsed(parse: &amp;Parse&lt;Program&gt;, options: &amp;FormatOptions)
+    -&gt; Result&lt;Formatted, FormatError&gt;;
+
+pub fn reorder(source: &amp;Source, options: &amp;FormatOptions)
+    -&gt; Result&lt;Reordered, ReorderError&gt;;
+<span class="boring">}</span></code></pre>
+<p><code>format</code> parses under <code>options.dialect</code>, lays the program out, and certifies the
+result. <code>format_parsed</code> is for a consumer that already holds a <code>Parse&lt;Program&gt;</code> — a
+language server, say — so morphe never forces a re-parse; it reads the dialect from
+the parse and ignores <code>options.dialect</code>. <code>reorder</code> is the <a href="#reordering">opt-in
+reorder</a>, a <em>separate</em> operation — <code>format</code> never changes
+statement order.</p>
+<h2 id="formatoptions"><a class="header" href="#formatoptions"><code>FormatOptions</code></a></h2>
+<pre class="playground"><code class="language-rust edition2024"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct FormatOptions {
+    pub line_width: usize,           // the one style knob; DEFAULT_LINE_WIDTH = 100
+    pub dialect: Dialect,            // the ASP dialect: clingo (default) or ASP-Core-2
+    pub preserve_spellings: bool,    // keep synonyms (proves LayoutOnly) vs normalize (UpToSpelling)
+    pub embedded: EmbeddedFormatters, // the injected backends (empty by default)
+    pub format_embedded: bool,       // reformat #script bodies (off by default)
+    pub reorder_includes: bool,      // the one unsafe reorder toggle (off by default)
+}
+<span class="boring">}</span></code></pre>
+<p><code>FormatOptions::default()</code> is width 100, clingo, everything off. <code>line_width</code> is the
+only layout knob — indent and the rest are fixed.</p>
+<h2 id="formatted-and-the-certificate"><a class="header" href="#formatted-and-the-certificate"><code>Formatted</code>, and the certificate</a></h2>
+<pre class="playground"><code class="language-rust edition2024"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct Formatted {
+    pub text: String,
+    pub certificate: Certificate,   // the relation proved of the ASP program
+    pub embedded_changed: bool,     // a #script body was reformatted
+    pub changed: bool,              // the text differs from the input
+    pub notes: Vec&lt;Diagnostic&gt;,     // embedded outcomes and other warnings
+}
+<span class="boring">}</span></code></pre>
+<p>The <code>certificate</code> is the heart of it: the proof, re-derived from morphe’s own
+output, that the text is <code>LayoutOnly</code> or <code>UpToSpelling</code> with respect to the input
+(see <a href="#how-morphe-proves-it-didnt-change-your-program">How morphe proves it didn’t change your program</a>).
+<code>format</code> cannot return an <code>Ok</code> it did not certify. When <code>embedded_changed</code> is true
+the whole-text guarantee is the composed one — the ASP certificate <em>plus</em> the
+equal-except-script-bodies check — not the certificate alone.</p>
+<p><code>reorder</code> returns the parallel <code>Reordered { text, certificate, reordered, changed, notes }</code>, where <code>reordered</code> says whether any unit actually moved, <code>certificate</code> is
+the uniform claim every unit earned, and the permutation proof itself is carried by
+the <code>Ok</code> return.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="diagnostics-and-exit-codes"><a class="header" href="#diagnostics-and-exit-codes">Diagnostics and exit codes</a></h1>
+<p>morphe returns typed refusals, never a panic or a bare string.</p>
+<h2 id="formaterror"><a class="header" href="#formaterror"><code>FormatError</code></a></h2>
+<pre class="playground"><code class="language-rust edition2024"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub enum FormatError {
+    HasParseErrors(Vec&lt;SyntaxError&gt;),
+    CertificateBroke { certificate: Certificate, reason: CertificateBreak },
+}
+<span class="boring">}</span></code></pre>
+<p>The two mean very different things. <code>HasParseErrors</code> is <em>your</em> input: a non-member,
+which morphe refuses whole (see <a href="#how-morphe-proves-it-didnt-change-your-program">safety</a>), handing back the
+parser’s own diagnostics for you to render. <code>CertificateBroke</code> is <em>morphe’s</em> bug —
+it means morphe produced output it could not certify, which must never happen; the
+<code>reason</code> locates it:</p>
+<pre class="playground"><code class="language-rust edition2024"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub enum CertificateBreak {
+    TokenMismatch(Mismatch),      // the output re-parsed, but a token diverged
+    NotAMember(Vec&lt;SyntaxError&gt;), // the output did not re-parse as a member
+}
+<span class="boring">}</span></code></pre>
+<p><code>reorder</code> mirrors this with <code>ReorderError::{HasParseErrors, PermutationBroke}</code>; a
+<code>PermutationBroke</code> (a per-unit mismatch, or a bijection breach recorded as a
+<code>BijectionBreach</code>) is the reorder’s equivalent of <code>CertificateBroke</code> — always a
+morphe bug. Warnings that do <em>not</em> refuse — an embedded-script skip, the
+<code>reorder_includes</code> note — ride in the <code>notes</code> field of the result, never as an
+error.</p>
+<h2 id="exit-codes-1"><a class="header" href="#exit-codes-1">Exit codes</a></h2>
+<p>The <code>morphe</code> command maps outcomes to four exit codes, so a script can branch on
+them:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Code</th><th>Meaning</th></tr>
+</thead>
+<tbody>
+<tr><td><code>0</code></td><td>Clean — already formatted, or formatted in place</td></tr>
+<tr><td><code>1</code></td><td>Changes needed (under <code>--check</code> / <code>--diff</code>)</td></tr>
+<tr><td><code>2</code></td><td>Usage error — bad arguments or a malformed <code>morphe.toml</code>; also a parse refusal</td></tr>
+<tr><td><code>70</code></td><td>Internal error — a morphe bug (a broken certificate); morphe never writes on this path</td></tr>
+</tbody>
+</table>
+</div>
+<p>A parse refusal (<code>HasParseErrors</code>) exits <code>2</code>; a broken certificate or permutation
+(<code>CertificateBroke</code>, <code>PermutationBroke</code>) exits <code>70</code>. Across a directory run the
+worst outcome wins, so a single internal error surfaces as <code>70</code>.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="the-embedded-fault-boundary"><a class="header" href="#the-embedded-fault-boundary">The embedded fault boundary</a></h1>
+<p>The embedded formatters — ruff and StyLua — are the one thing morphe runs that it
+does not itself verify. They sit behind a single seam, and everything they can do
+wrong is contained there.</p>
+<h2 id="the-seam"><a class="header" href="#the-seam">The seam</a></h2>
+<pre class="playground"><code class="language-rust edition2024"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub trait EmbeddedFormatter {
+    fn language(&amp;self) -&gt; &amp;LanguageKey;
+    fn availability(&amp;self) -&gt; Availability;
+    fn format(&amp;self, body: &amp;str, cx: &amp;EmbeddedContext)
+        -&gt; Result&lt;String, EmbeddedError&gt;;
+}
+<span class="boring">}</span></code></pre>
+<p>A caller assembles the backends into an <code>EmbeddedFormatters</code> registry and puts it
+in <code>FormatOptions::embedded</code>; the core asks it by language and knows nothing else
+about a backend — not its name, not whether it links a library or shells out. The
+concrete <code>RuffLibBackend</code> and <code>StyLuaLibBackend</code> live behind the Cargo features
+<code>embedded-python</code> and <code>embedded-lua</code>.</p>
+<h2 id="every-failure-converges-to-one-outcome"><a class="header" href="#every-failure-converges-to-one-outcome">Every failure converges to one outcome</a></h2>
+<pre class="playground"><code class="language-rust edition2024"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub enum EmbeddedError {
+    Unsupported,                    // no backend for this language
+    Unavailable { reason: String }, // backend disabled or absent
+    Failed { message: String },     // the backend rejected the body
+    Unverified,                     // the backend's own round-trip check failed
+    Panicked,                       // a panic, caught at the boundary
+}
+<span class="boring">}</span></code></pre>
+<p>Whatever the reason, the result is the same: <strong>that script body stays verbatim, a
+warning goes into <code>notes</code>, and nothing short-circuits.</strong> One failed script never
+stops the others or the ASP format; across a batch, one file never aborts the run.
+A failure lands exactly where <code>format_embedded = false</code> would — never anywhere
+worse — so embedded outcomes are warnings and never change the exit code.</p>
+<p>A panic inside a linked backend is caught with <code>std::panic::catch_unwind</code> and
+turned into <code>Panicked</code>; this relies on the unwinding panic strategy, which morphe’s
+build profiles pin. See <a href="#embedded-scripts">Embedded scripts</a> for the
+composed-safety argument, and
+<a href="https://github.com/GregoryGelfond/morphe/blob/main/docs/security/threat-model.md">the threat model</a>
+for the residuals morphe records.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="language-coverage"><a class="header" href="#language-coverage">Language coverage</a></h1>
+<p>morphe does not parse ASP itself. It is built on <strong>themelios-syntax</strong>, and what
+morphe admits is exactly what that parser admits — so “what morphe covers” is a
+question about the tier’s language surface, not a second grammar morphe maintains.</p>
+<h2 id="the-two-dialects"><a class="header" href="#the-two-dialects">The two dialects</a></h2>
+<p>morphe formats two dialects, selected by <code>--dialect</code> (default <code>clingo</code>):</p>
+<ul>
+<li><strong><code>clingo</code></strong> — the clingo/clingcon language: rules and integrity constraints,
+choice rules and aggregates (<code>#count</code>, <code>#sum</code>, <code>#min</code>, <code>#max</code>), conditions,
+optimization (<code>#minimize</code> / <code>#maximize</code> and weak constraints), the directive
+families (<code>#show</code>, <code>#const</code>, <code>#defined</code>, <code>#external</code>, <code>#program</code>, <code>#include</code>,
+<code>#project</code>, <code>#heuristic</code>, <code>#edge</code>, <code>#theory</code>), clingcon <strong>theory atoms</strong> (<code>&amp;dom</code>,
+<code>&amp;sum</code>, <code>&amp;distinct</code>, …), and embedded <code>#script(python|lua)</code> blocks.</li>
+<li><strong><code>asp-core-2</code></strong> — the ASP-Core-2 standard, including its query form (an atom
+followed by <code>?</code>, which must be the program’s final statement).</li>
+</ul>
+<p>Both dialects share the <code>.lp</code> extension, so nothing disambiguates by filename; the
+default holds unless you set <code>--dialect</code>.</p>
+<h2 id="what-morphe-admits-and-what-it-refuses"><a class="header" href="#what-morphe-admits-and-what-it-refuses">What morphe admits, and what it refuses</a></h2>
+<p>morphe formats a <strong>member</strong> — a program the tier parses without error. Everything
+the typed AST expresses, morphe lays out: rules, aggregates, theory atoms and
+<code>#theory</code> definitions, comments and <code>%!</code> documentation, and <code>#script</code> regions (kept
+verbatim unless you opt into <a href="#embedded-scripts">embedded formatting</a>).</p>
+<p>A file with parse errors is a <strong>non-member</strong>, and morphe refuses it whole rather
+than formatting around the broken regions (see <a href="#how-morphe-proves-it-didnt-change-your-program">How morphe proves it didn’t change
+your program</a>). A program nested more deeply than the tier’s
+default limit is likewise refused as a parse error, rather than risking the stack.</p>
+<p>Because admission is the tier’s, morphe tracks the language by advancing its pinned
+<code>themelios-syntax</code> revision — never by growing a parser of its own.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="vocabulary"><a class="header" href="#vocabulary">Vocabulary</a></h1>
+<p>One concept, one name. This page is the registry the rest of the book and the
+source hold to.</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Concept</th><th>morphe term</th></tr>
+</thead>
+<tbody>
+<tr><td>The relation morphe proves its output stands in to the input — nothing but whitespace changed</td><td><strong><code>LayoutOnly</code></strong></td></tr>
+<tr><td>The same, save that interchangeable operators were normalized to a canonical spelling</td><td><strong><code>UpToSpelling</code></strong></td></tr>
+<tr><td>The proof, re-derived by re-parsing morphe’s own output before it is returned, that one of those relations holds</td><td><strong>certificate</strong></td></tr>
+<tr><td>The authority (from themelios-syntax) that fixes the minimum whitespace two tokens must carry between them</td><td><strong>oracle</strong> — the fusion oracle, a <em>floor</em> the house style may exceed but never undercut</td></tr>
+<tr><td>An input morphe can parse, and so format</td><td><strong>member</strong> — a <strong>non-member</strong> has parse errors and is refused, unformatted</td></tr>
+<tr><td>A top-level statement the reorder moves as a whole, carrying its comments with it</td><td><strong>unit</strong></td></tr>
+<tr><td>A statement the reorder never moves, and never reorders across</td><td><strong>barrier</strong> (a fence) — <code>#include</code> by default</td></tr>
+<tr><td>The proof that a reorder was a pure permutation of the units — nothing added, dropped, or split</td><td><strong>permutation certificate</strong></td></tr>
+<tr><td>Where a comment attaches, and in which position</td><td><strong>anchor</strong> and <strong>slot</strong> — <code>Leading</code>, <code>Trailing</code>, or <code>Dangling</code></td></tr>
+<tr><td>A boundary that admits external input</td><td><strong>door</strong></td></tr>
+<tr><td>The fixed set of layout decisions morphe imposes</td><td><strong>the house style</strong> — whose one configurable knob is the <strong>line width</strong></td></tr>
+<tr><td>The contained boundary through which an embedded formatter (ruff, StyLua) is called</td><td><strong><code>EmbeddedFormatter</code></strong> — the seam</td></tr>
+<tr><td>What a failed, unavailable, or disturbing backend converges to: the body left verbatim, a note recorded</td><td><strong>degradation</strong></td></tr>
+</tbody>
+</table>
+</div>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="building-the-documentation"><a class="header" href="#building-the-documentation">Building the documentation</a></h1>
+<p>The book is built with mdBook 0.5.4, pinned so the rendered output matches what
+the checks build.</p>
+<p>Install the exact version:</p>
+<pre><code class="language-sh">cargo install --locked --version '=0.5.4' mdbook
+</code></pre>
+<p>Build the book — output lands under the git-ignored <code>target/book/</code>:</p>
+<pre><code class="language-sh">mdbook build
+</code></pre>
+<p>Or run it through the project’s check entry point:</p>
+<pre><code class="language-sh">scripts/check.sh book
+</code></pre>
+<p>The Markdown sources live under <a href=""><code>docs/book/</code></a>; <code>book.toml</code> at the repository
+root configures the build. The design-of-record documents — the design of record
+<a href="https://github.com/GregoryGelfond/morphe/blob/main/docs/design/morphe.md"><code>docs/design/morphe.md</code></a>,
+the findings ledger
+<a href="https://github.com/GregoryGelfond/morphe/blob/main/docs/findings.md"><code>docs/findings.md</code></a>,
+and the threat model
+<a href="https://github.com/GregoryGelfond/morphe/blob/main/docs/security/threat-model.md"><code>docs/security/threat-model.md</code></a>
+— are kept outside the book and linked from <a href="#about-this-book">About this book</a>.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+        <template id=fa-eye><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM432 256c0 79.5-64.5 144-144 144s-144-64.5-144-144s64.5-144 144-144s144 64.5 144 144zM288 192c0 35.3-28.7 64-64 64c-11.5 0-22.3-3-31.6-8.4c-.2 2.8-.4 5.5-.4 8.4c0 53 43 96 96 96s96-43 96-96s-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6z"/></svg></span></template>
+        <template id=fa-eye-slash><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L525.6 386.7c39.6-40.6 66.4-86.1 79.9-118.4c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C465.5 68.8 400.8 32 320 32c-68.2 0-125 26.3-169.3 60.8L38.8 5.1zM223.1 149.5C248.6 126.2 282.7 112 320 112c79.5 0 144 64.5 144 144c0 24.9-6.3 48.3-17.4 68.7L408 294.5c5.2-11.8 8-24.8 8-38.5c0-53-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6c0 10.2-2.4 19.8-6.6 28.3l-90.3-70.8zm223.1 298L373 389.9c-16.4 6.5-34.3 10.1-53 10.1c-79.5 0-144-64.5-144-144c0-6.9 .5-13.6 1.4-20.2L83.1 161.5C60.3 191.2 44 220.8 34.5 243.7c-3.3 7.9-3.3 16.7 0 24.6c14.9 35.7 46.2 87.7 93 131.1C174.5 443.2 239.2 480 320 480c47.8 0 89.9-12.9 126.2-32.5z"/></svg></span></template>
+        <template id=fa-copy><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"/></svg></span></template>
+        <template id=fa-play><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></template>
+        <template id=fa-clock-rotate-left><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9V168c0 13.3 10.7 24 24 24H134.1c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24V256c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65V152c0-13.3-10.7-24-24-24z"/></svg></span></template>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr-ef4e11c1.min.js"></script>
+        <script src="mark-09e88c2c.min.js"></script>
+        <script src="searcher-09f2665d.js"></script>
+
+        <script src="clipboard-1626706a.min.js"></script>
+        <script src="highlight-abc7f01d.js"></script>
+        <script src="book-609e4cb8.js"></script>
+
+        <!-- Custom JS scripts -->
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+
+    </div>
+    </body>
+</html>
