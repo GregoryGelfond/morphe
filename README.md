@@ -1,10 +1,13 @@
 # morphe
 
-[![Gate CI status](https://img.shields.io/github/actions/workflow/status/GregoryGelfond/morphe/gate.yml?branch=main&style=flat-square&label=gate)](https://github.com/GregoryGelfond/morphe/actions/workflows/gate.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 ![Rust 1.97+](https://img.shields.io/badge/rust-1.97%2B-orange?style=flat-square)
+[![Coverage 94%](https://img.shields.io/badge/coverage-94%25-brightgreen?style=flat-square)](CONTRIBUTING.md#verification-and-review)
+[![Documentation](https://img.shields.io/badge/docs-the%20morphe%20book-blue?style=flat-square)](https://gregorygelfond.github.io/morphe/)
 
 μορφή, *form* — an opinionated formatter for Answer Set Programming.
+
+**Documentation: [the morphe Book](https://gregorygelfond.github.io/morphe/).**
 
 morphe gives your clingo and ASP-Core-2 programs one clean, consistent look — the
 way `rustfmt`, `black`, and `ruff` do for their languages. The house style is
@@ -295,13 +298,23 @@ instead carries its own tool's guarantee ([ruff], [StyLua]), kept behind a
 hardened boundary — see
 [`docs/security/threat-model.md`](docs/security/threat-model.md).
 
+## Documentation
+
+- **[The morphe Book](https://gregorygelfond.github.io/morphe/)** — the manual: the
+  house style, the safety argument, and the Rust library.
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) — the standard the work is held to.
+- The design of record, [`docs/design/morphe.md`](docs/design/morphe.md), and the
+  security posture, [`docs/security/threat-model.md`](docs/security/threat-model.md).
+
 ## Using morphe as a library
 
 morphe is a library first; the `morphe` binary is a thin shell over it.
-`morphe::format` takes a parsed source and returns the formatted text along with
-the proof it checked, or a typed refusal — the core is pure and does no I/O.
-Since the crate isn't published yet, the API is documented in the design of
-record, [`docs/design/morphe.md`](docs/design/morphe.md).
+`morphe::format` takes a source, parses and lays it out, and returns the formatted
+text along with the proof it checked, or a typed refusal — the core is pure and
+does no I/O.
+The Book's [Rust library](https://gregorygelfond.github.io/morphe/library/getting-started.html)
+part is the guide; the design of record,
+[`docs/design/morphe.md`](docs/design/morphe.md), is the full reference.
 
 ## Project layout
 
@@ -313,14 +326,13 @@ record, [`docs/design/morphe.md`](docs/design/morphe.md).
 ## Development
 
 ```sh
-cargo test --workspace                          # the suite is the executable spec
-cargo clippy --workspace --all-targets -- -D warnings
-cargo fmt --all --check
+scripts/check.sh full     # fmt, clippy, test, doc, coverage, the book, and the clingo differential
 ```
 
-The same checks run in CI (`.github/workflows/gate.yml`). The clingo differential
-and the criterion benches run out of band — they need clingo and the `pixi`
-environment.
+`scripts/check.sh` is the single gate entry point; run `full` before you push.
+Hosted CI is paused (the GitHub Actions quota; it resumes at the October refresh),
+so the local gate is the gate — see
+[`CONTRIBUTING.md`](CONTRIBUTING.md#verification-and-review).
 
 ## Status
 
@@ -331,6 +343,12 @@ record is [`docs/design/morphe.md`](docs/design/morphe.md); the security posture
 is [`docs/security/threat-model.md`](docs/security/threat-model.md). It is held to
 a high engineering bar: a standing gate of formatting, lints, and property tests,
 plus a fuzz target and a differential against clingo itself.
+
+## Built on
+
+[themelios](https://github.com/GregoryGelfond/themelios) — the ASP program
+representation morphe parses and lays out. morphe is a leaf client of the tier: it
+consumes `themelios-syntax`, pinned by git revision, and never modifies it.
 
 ## License
 
