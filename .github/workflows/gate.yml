@@ -1,5 +1,5 @@
 # The standing gate (docs/design/morphe.md §13): the four checks kept green on
-# every push, plus the committed coverage floor. The out-of-band clingo
+# every change, plus the committed coverage floor. The out-of-band clingo
 # differential and the criterion benches are not here — they need the pixi
 # environment and run out of band (§13).
 #
@@ -8,9 +8,12 @@
 # themelios is needed.
 name: gate
 
+# PAUSED pending the October GitHub Actions refresh (the quota is exhausted). The
+# workflow is retained as documented intent and runs only on manual dispatch;
+# until it resumes, the local gate is the gate — run `scripts/check.sh full`
+# before pushing (see CONTRIBUTING.md, "Verification and review").
 on:
-  push:
-  pull_request:
+  workflow_dispatch:
 
 env:
   CARGO_TERM_COLOR: always
@@ -24,7 +27,7 @@ jobs:
         with:
           path: morphe
       - name: Install the toolchain
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@1.97.1
         with:
           components: rustfmt, clippy, llvm-tools-preview
       - name: Install cargo-llvm-cov

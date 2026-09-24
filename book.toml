@@ -1,0 +1,17 @@
+[book]
+title = "The morphe Book"
+authors = ["Gregory Gelfond"]
+language = "en"
+src = "docs/book"
+description = "An opinionated, safety-certified formatter for Answer Set Programming: the house style, the meaning-preservation certificate, and the Rust library."
+
+[build]
+build-dir = "target/book"
+
+[rust]
+edition = "2024"
+
+[output.html]
+git-repository-url = "https://github.com/GregoryGelfond/morphe"
+edit-url-template = "https://github.com/GregoryGelfond/morphe/edit/main/{path}"
+smart-punctuation = true
