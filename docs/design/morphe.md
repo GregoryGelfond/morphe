@@ -20,8 +20,8 @@ best-of-breed formatter, and to *exercise and stress* the formatter-facing
 surface and route what it finds back into the tier (§14).
 
 Cross-references of the form "syntax.md §N", "spec §N", "grammar §N" are
-to the themelios repository (`~/Projects/themelios/docs/`). References of
-the form "§N" alone are to this document.
+to the [themelios repository](https://github.com/GregoryGelfond/themelios)
+(its `docs/`). References of the form "§N" alone are to this document.
 
 ---
 
@@ -1104,10 +1104,13 @@ backend module and invisible to morphe's core. This assumes the unwinding
 panic strategy — morphe's profiles keep `panic = "unwind"`; under `panic =
 "abort"` `catch_unwind` catches nothing, and the subprocess seam (§16) is
 the abort-profile fallback. It is 100% safe Rust; the wrapping needs no
-`unsafe` (§12). A true *hang* (no timeout on an in-process call) is the one
-residual an in-process integration cannot absorb; it is not reachable on
-real script bodies, and the escape hatch, if it ever is, is a watchdog or
-an opt-in subprocess backend *behind the same seam*, with no core change.
+`unsafe` (§12). Two residuals an in-process integration cannot absorb remain — a
+*hang* (unbounded time) and a *memory blow-up* (unbounded allocation), distinct
+because a watchdog bounds the first but only a subprocess under an OS resource
+limit bounds the second (threat-model §4.1). Neither is reachable on real script
+bodies, and the escape hatch, if one is ever needed, is a watchdog (for time) or
+an opt-in subprocess backend under a resource limit (for time and memory) *behind
+the same seam*, with no core change.
 
 ### 9.6 The backends, concretely
 
