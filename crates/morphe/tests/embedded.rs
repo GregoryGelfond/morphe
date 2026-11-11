@@ -107,6 +107,31 @@ fn a_claimed_body_is_reformatted_and_the_asp_certificate_stands() {
 }
 
 #[test]
+fn a_reformatted_body_keeps_the_line_break_after_the_script_header() {
+    // §7.2: morphe never alters the whitespace at the `)`/body boundary, so the
+    // line break that ends the `#script(…)` line survives a backend that, like a
+    // whole-module formatter, drops a body's leading blank lines.
+    let options = formatting_embedded(registry(MockBackend::new(
+        "python",
+        Behavior::Reformat("x = 1\n".to_owned()),
+    )));
+    let formatted = format(&source(ONE_SCRIPT), &options).expect("a member formats");
+    assert_eq!(formatted.text, "a.\n#script(python)\nx = 1\n#end.\nb.\n");
+}
+
+#[test]
+fn the_header_line_break_is_kept_byte_exact_with_its_trailing_blanks() {
+    // §7.2: the boundary run — blanks, then a CRLF — is kept exactly as written.
+    let options = formatting_embedded(registry(MockBackend::new(
+        "python",
+        Behavior::Reformat("x = 1\r\n".to_owned()),
+    )));
+    let formatted = format(&source("#script (python) \t\r\nx=1\r\n#end.\n"), &options)
+        .expect("a member formats");
+    assert_eq!(formatted.text, "#script(python) \t\r\nx = 1\r\n#end.\n");
+}
+
+#[test]
 fn every_backend_refusal_keeps_the_body_verbatim_with_a_note() {
     // §9.4: every EmbeddedError collapses to one outcome — that body stays
     // verbatim, a warning note is recorded, and the format is not refused.
@@ -385,6 +410,16 @@ mod ruff {
     }
 
     #[test]
+    fn a_python_body_starts_on_the_line_after_the_script_header() {
+        // §7.2: ruff drops a module's leading blank lines; the header's line
+        // break is morphe's, not the body's, and survives the reformat.
+        assert_eq!(
+            python("#script(python)\ndef main( prg ):\n        prg.solve()\n#end.\n"),
+            "#script(python)\ndef main(prg):\n    prg.solve()\n#end.\n"
+        );
+    }
+
+    #[test]
     fn an_invalid_python_body_stays_verbatim_with_a_note() {
         // §9.4: ruff rejects the body (its own syntax error) → Failed → verbatim + note.
         let options = formatting_embedded(registry_with("python", Box::new(RuffLibBackend::new())));
@@ -452,6 +487,16 @@ mod stylua {
         assert_eq!(
             once, twice,
             "StyLua is at its fixed point on the formatted body"
+        );
+    }
+
+    #[test]
+    fn a_lua_body_starts_on_the_line_after_the_script_header() {
+        // §7.2: StyLua drops a chunk's leading blank lines; the header's line
+        // break is morphe's, not the body's, and survives the reformat.
+        assert_eq!(
+            lua("#script(lua)\nfunction main(prg)\n  prg:solve()\nend\n#end.\n"),
+            "#script(lua)\nfunction main(prg)\n\tprg:solve()\nend\n#end.\n"
         );
     }
 
