@@ -332,7 +332,10 @@ fn script_statements(parse: &Parse<Program>) -> Vec<ScriptStatement> {
 /// the head of `body` — a run of blanks and tabs closed by a newline — or zero
 /// where the body's first line carries text. It stands at the `)`/body boundary,
 /// which morphe never alters (§7.2), so a backend that drops a body's leading
-/// blank lines cannot pull the body's first line up onto the header.
+/// blank lines cannot pull the body's first line up onto the header. A newline
+/// is the tier's line break: `\n`, its line's `\r` before it, if any, being part
+/// of the run. A lone `\r` ends no line in the tier, so a body opening with one
+/// has text on its first line and goes to the backend whole.
 fn header_break_len(body: &str) -> usize {
     let blanks = body.len() - body.trim_start_matches([' ', '\t']).len();
     match body.as_bytes().get(blanks..) {
@@ -431,4 +434,38 @@ fn note(
         },
     )
     .expect("the embedded note message is never empty")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::header_break_len;
+
+    #[test]
+    fn a_newline_after_any_blanks_is_the_header_break() {
+        assert_eq!(header_break_len("\nx=1\n"), 1);
+        assert_eq!(header_break_len(" \t\nx=1\n"), 3);
+    }
+
+    #[test]
+    fn a_crlf_after_any_blanks_is_the_header_break() {
+        assert_eq!(header_break_len("\r\nx=1\r\n"), 2);
+        assert_eq!(header_break_len(" \t\r\nx=1\r\n"), 4);
+    }
+
+    #[test]
+    fn a_first_line_carrying_text_has_no_header_break() {
+        assert_eq!(header_break_len(" x=1\n"), 0);
+        assert_eq!(header_break_len("x=1\n"), 0);
+    }
+
+    #[test]
+    fn a_body_with_no_newline_has_no_header_break() {
+        assert_eq!(header_break_len("   "), 0);
+        assert_eq!(header_break_len(""), 0);
+    }
+
+    #[test]
+    fn a_lone_carriage_return_is_not_a_header_break() {
+        assert_eq!(header_break_len("\rx=1\n"), 0);
+    }
 }
