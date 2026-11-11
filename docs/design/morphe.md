@@ -1035,7 +1035,8 @@ backend owns and translates its own privately. The seam unifies the *verb*
 
 The string a backend is handed is the body's *interior*, not the whole
 `SCRIPT_BODY`: where the body opens with the line break that ends the
-`#script(lang)` line — blanks and tabs, then a newline — that run is the
+`#script(lang)` line — blanks and tabs, then the tier's line break (`\n`,
+optionally after a `\r`; a lone `\r` ends no line) — that run is the
 `)`/body boundary morphe never alters (§7.2), so morphe holds it back and
 splices it in front of the backend's result unchanged. A whole-module
 formatter drops a module's leading blank lines, and handed the whole body it
