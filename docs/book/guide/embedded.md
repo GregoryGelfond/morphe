@@ -30,6 +30,22 @@ back in. It is gated twice, so the lean default costs nothing:
   dependencies.
 - **At run time**, it is still off unless you pass `--format-embedded`.
 
+With both on, the program above becomes:
+
+```clingo
+count(N) :- N = #count{ X : item(X) }.
+#script(python)
+def main(prg):
+    prg.ground([("base", [])])
+    prg.solve()
+#end.
+item(a).
+item(b).
+```
+
+The backend formats the body's interior only: the line break after
+`#script(python)` belongs to the header, and morphe keeps it as written.
+
 ## The safety, composed
 
 morphe's certificate is a statement about your *ASP program*, and reformatting a

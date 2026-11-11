@@ -9,6 +9,14 @@ that breaks either bumps the major.
 
 ## [Unreleased]
 
+### Fixed
+
+- With `--format-embedded`, a reformatted `#script` body kept its first line on
+  the line after `#script(lang)` instead of being pulled up onto it
+  (`#script(python)def main(prg):`). ruff and StyLua drop a body's leading blank
+  lines, and morphe handed them the line break that ends the header line; it now
+  keeps that line break as written and hands the backend only the body after it.
+
 ## [1.0.8] - 2026-09-23
 
 No user-facing changes: the house style and the command-line surface behave

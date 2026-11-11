@@ -246,14 +246,16 @@ pub(crate) fn format_scripts(
             continue; // no language to dispatch on, or an empty region: nothing to format
         };
         let language = language.text();
-        let verbatim = body.text();
-        match options.embedded.format(language, verbatim, &context) {
-            Ok(formatted) if formatted == verbatim => {
+        // The header's line break is the `)`/body boundary, which morphe never
+        // alters (§7.2); only the interior after it is the backend's to format.
+        let (header_break, interior) = body.text().split_at(header_break_len(body.text()));
+        match options.embedded.format(language, interior, &context) {
+            Ok(formatted) if formatted == interior => {
                 // The backend is at its fixed point on this body: a no-op, no note.
             }
             Ok(formatted) => candidates.push(Candidate {
                 span: byte_range(body.syntax().text_range()),
-                formatted,
+                formatted: format!("{header_break}{formatted}"),
                 rejection: structure_note(input, source_script, language),
             }),
             Err(error) => notes.push(refusal_note(input, source_script, language, &error)),
@@ -324,6 +326,20 @@ fn script_statements(parse: &Parse<Program>) -> Vec<ScriptStatement> {
             _ => None,
         })
         .collect()
+}
+
+/// The byte length of the line break that ends the `#script(…)` header line at
+/// the head of `body` — a run of blanks and tabs closed by a newline — or zero
+/// where the body's first line carries text. It stands at the `)`/body boundary,
+/// which morphe never alters (§7.2), so a backend that drops a body's leading
+/// blank lines cannot pull the body's first line up onto the header.
+fn header_break_len(body: &str) -> usize {
+    let blanks = body.len() - body.trim_start_matches([' ', '\t']).len();
+    match body.as_bytes().get(blanks..) {
+        Some([b'\n', ..]) => blanks + 1,
+        Some([b'\r', b'\n', ..]) => blanks + 2,
+        _ => 0,
+    }
 }
 
 /// `range` as byte offsets into the source text (the tier's `TextSize` is a byte

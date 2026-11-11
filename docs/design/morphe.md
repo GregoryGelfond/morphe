@@ -1033,6 +1033,14 @@ backends' configs — ruff's and StyLua's option surfaces differ, and each
 backend owns and translates its own privately. The seam unifies the *verb*
 (format this string), not the *knobs*.
 
+The string a backend is handed is the body's *interior*, not the whole
+`SCRIPT_BODY`: where the body opens with the line break that ends the
+`#script(lang)` line — blanks and tabs, then a newline — that run is the
+`)`/body boundary morphe never alters (§7.2), so morphe holds it back and
+splices it in front of the backend's result unchanged. A whole-module
+formatter drops a module's leading blank lines, and handed the whole body it
+would pull the body's first line up onto the header.
+
 ### 9.2 Feature-gated backends, runtime opt-in
 
 Two orthogonal gates keep the core lean and the default safe:
