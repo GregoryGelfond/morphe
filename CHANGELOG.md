@@ -9,13 +9,16 @@ that breaks either bumps the major.
 
 ## [Unreleased]
 
+## [1.0.9] - 2026-11-11
+
 ### Fixed
 
-- With `--format-embedded`, a reformatted `#script` body kept its first line on
-  the line after `#script(lang)` instead of being pulled up onto it
-  (`#script(python)def main(prg):`). ruff and StyLua drop a body's leading blank
-  lines, and morphe handed them the line break that ends the header line; it now
-  keeps that line break as written and hands the backend only the body after it.
+- With `--format-embedded`, a reformatted `#script` body no longer has its first
+  line pulled up onto the `#script(lang)` line (`#script(python)def main(prg):`);
+  it now starts on the line after it, as written. ruff and StyLua drop a body's
+  leading blank lines, and morphe handed them the line break that ends the header
+  line; it now keeps that line break as written and hands the backend only the
+  body after it.
 
 ## [1.0.8] - 2026-09-23
 
@@ -188,7 +191,8 @@ carries its own posture in `docs/security/threat-model.md`. Not yet on crates.io
 (it depends on `themelios-syntax` by path): build from source with the two
 repositories cloned as siblings. Rust 1.97+ (edition 2024).
 
-[Unreleased]: https://github.com/GregoryGelfond/morphe/compare/v1.0.8...HEAD
+[Unreleased]: https://github.com/GregoryGelfond/morphe/compare/v1.0.9...HEAD
+[1.0.9]: https://github.com/GregoryGelfond/morphe/compare/v1.0.8...v1.0.9
 [1.0.8]: https://github.com/GregoryGelfond/morphe/compare/v1.0.7...v1.0.8
 [1.0.7]: https://github.com/GregoryGelfond/morphe/compare/v1.0.6...v1.0.7
 [1.0.6]: https://github.com/GregoryGelfond/morphe/compare/v1.0.5...v1.0.6
